@@ -441,10 +441,7 @@ def guide_page(g):
         er = "".join(f'<details class="err"><summary>{E(a)}</summary><p>{b}</p><p><b>الحل:</b> {c}</p></details>' for a, b, c in g["errors"])
         H("errors", "مشاكل وحلول", er)
     rf = "".join(f'<li><a href="{E(u)}" rel="noopener">{E(t)}</a></li>' for t, u in g["refs"])
-    li = (f'<details class="li"><summary>ملخص المشروع لـ LinkedIn</summary><div class="li-g">'
-          f'<div class="li-c"><div class="li-h"><b>العربية</b><button type="button" class="copy" data-copy="li-ar-{g["slug"]}">نسخ</button></div><p id="li-ar-{g["slug"]}">{E(g["li_ar"])}</p></div>'
-          f'<div class="li-c" dir="ltr" lang="en"><div class="li-h"><b>English</b><button type="button" class="copy" data-copy="li-en-{g["slug"]}">Copy</button></div><p id="li-en-{g["slug"]}">{E(g["li_en"])}</p></div></div></details>')
-    H("refs", "المراجع", f'<ul class="refs-l">{rf}</ul>{li}')
+    H("refs", "المراجع", f'<ul class="refs-l">{rf}</ul>')
 
     ordered = sorted(GUIDES, key=lambda x: x["order"]); i = ordered.index(g)
     prv = ordered[i - 1] if i > 0 else None; nxt = ordered[i + 1] if i < len(ordered) - 1 else None
