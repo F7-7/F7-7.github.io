@@ -1,0 +1,270 @@
+# -*- coding: utf-8 -*-
+"""Landing page with scroll storytelling. Lab facts come from tools/story.json (written by build.py from captures)."""
+import html, json, os, sys
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+from content import GUIDES
+from build import STATUS, WP
+E = html.escape
+st = json.load(open(os.path.join(ROOT, "tools", "story.json")))
+hexb = st["hex_frame"][:84]
+hexs = " ".join(hexb[i:i+2] for i in range(0, len(hexb), 2))
+(hs1, _), (hs2a, hs2b), (hs3a, hs3b) = st["hs"]
+(v1, t1), (v2, t2) = st["iv"]
+
+CH = [
+ ("01", "الأجهزة", "نبدأ بثلاثة أجهزة افتراضية على VMware: عميل Windows 7، وخادم Windows Server، وعميل ثانٍ لاستقبال البريد.", "fahad-PC · Windows Server · saif-PC"),
+ ("02", "الوصلات", "نضع البطاقات الثلاث على نفس الشبكة الافتراضية. لا يوجد راوتر بعد: كل الأجهزة في نفس نطاق البث.", "VMware virtual network"),
+ ("03", "عناوين IP", "لكل جهاز عنوان ثابت من النطاق المخصص للطالب في المعمل، من 189.120.0.57 إلى 189.120.0.64.", f"A {st['macs']['A']}\nB {st['macs']['B']}"),
+ ("04", "الاختبار الأول", f"قبل أي ping يسأل الجهاز عن MAC الخادم بـ ARP. بعدها أُرسلت {st['ping']['req']} طلبات ICMP ورجعت {st['ping']['rep']} ردود، كلها بـ TTL {st['ping']['ttl']}.", st["arp"][0] + "\n" + st["arp"][1]),
+ ("05", "الخدمات", "على الخادم نشغّل الخدمات التي سنحللها، وكل خدمة تنتظر على منفذها.", "FTP 21 · SMTP 587 · POP3 110 · Telnet 23"),
+ ("06", "تحليل الحزم", "نفتح الالتقاط ونقرأ المصافحة الثلاثية لجلسة FTP بأرقامها الحقيقية، ثم نفكك كل إطار بايتًا بايتًا.", f"SYN      Seq={hs1}\nSYN-ACK  Seq={hs2a} Ack={hs2b}\nACK      Seq={hs3a} Ack={hs3b}"),
+ ("07", "VLAN والتوجيه", f"في المعمل الثاني نقسم الشبكة بسويتشين وراوتر في GNS3. نفس طلب ping عبر الـ Trunk مرتين: بوسم {v1} و TTL {t1}، ثم بوسم {v2} و TTL {t2}.", f"VID {v1} · TTL {t1}  →  R  →  VID {v2} · TTL {t2}"),
+]
+
+cards = []
+for g in sorted(GUIDES, key=lambda g: g["order"]):
+    s = STATUS[g["status"]]
+    cards.append(f'<a class="card" href="guides/{g["slug"]}/"><div class="card-t"><span class="mono">{g["course"]}</span><span class="st st-{s[0]}"><i></i>{s[1]}</span></div>'
+                 f'<h3>{E(g["title"])}</h3><p>{E(g["summary"])}</p><span class="more">افتح الدليل</span></a>')
+
+chaps = "".join(f'<article class="chap" data-stage="{i}"><span class="ck mono">{n}</span><h3>{E(t)}</h3><p>{E(b)}</p><pre class="term mono" dir="ltr">{E(x)}</pre></article>' for i, (n, t, b, x) in enumerate(CH))
+story_json = json.dumps({"macs": st["macs"], "ttl": st["ping"]["ttl"], "iv": st["iv"]})
+
+PAGE = f"""<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fahad Net Lab · منصة مشاريع الشبكات</title>
+<meta name="description" content="منصة تعليمية تبني الشبكة خطوة بخطوة وتشرح كل حزمة من ملفات التقاط حقيقية. مشاريع COS 370 و COS 372 لفهد عواد.">
+<meta property="og:title" content="Fahad Net Lab"><meta property="og:description" content="نبني الشبكة ونفهم كل حزمة فيها، من ملفات التقاط حقيقية.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111433'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%237C83FF' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Landing: one committed dark world. A sticky canvas draws the lab while chapters scroll past it. */
+:root{{--ink:#08090F;--panel:#0F111A;--panel-2:#141726;--line:#1E2235;--fg:#EDEEF7;--fg-2:#B9BDD6;--muted:#7F85A6;
+  --accent:#8C8CFF;--accent-2:#B4A5FF;--data:#45D2EC;--warm:#F2B65A;--ok:#4FD39A;
+  --f-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --gutter:clamp(16px,4vw,48px);color-scheme:dark}}
+*{{box-sizing:border-box}}
+body{{margin:0;background:var(--ink);color:var(--fg);font-family:var(--f-ui);font-size:17px;line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased}}
+a{{color:inherit;text-decoration:none}}
+h1,h2,h3{{margin:0;line-height:1.25;text-wrap:balance}}
+p{{margin:0}}
+.mono{{font-family:var(--f-mono)}}
+:focus-visible{{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}}
+.wrap{{max-width:1240px;margin:0 auto;padding-inline:var(--gutter)}}
+.top{{position:fixed;top:0;inset-inline:0;z-index:20;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}}
+.top.solid{{background:rgba(8,9,15,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}}
+.top-in{{display:flex;align-items:center;gap:22px;height:62px}}
+.brand{{display:flex;align-items:center;gap:10px;font-weight:700}}
+.logo{{width:26px;height:26px;border-radius:8px;background:linear-gradient(140deg,var(--accent),var(--data))}}
+.nav{{display:flex;gap:4px;margin-inline-start:auto;font-size:14.5px}}
+.nav a{{color:var(--muted);padding:6px 12px;border-radius:8px}}
+.nav a:hover{{color:var(--fg);background:var(--panel-2)}}
+.btn{{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;background:var(--fg);color:var(--ink);transition:transform .2s,box-shadow .2s}}
+.btn:hover{{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(140,140,255,.7)}}
+.btn.ghost{{background:transparent;color:var(--fg);border:1px solid var(--line)}}
+@media (max-width:760px){{.nav a.h{{display:none}}}}
+
+.hero{{position:relative;padding:150px 0 70px;overflow:hidden}}
+.hero::before{{content:"";position:absolute;inset:-30% -10% auto;height:120%;background:radial-gradient(40% 50% at 70% 20%,rgba(140,140,255,.22),transparent 70%),radial-gradient(30% 40% at 25% 40%,rgba(69,210,236,.12),transparent 70%);pointer-events:none}}
+.hero .wrap{{position:relative;display:grid;gap:22px;justify-items:start}}
+.pill{{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--fg-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--panel)}}
+.pill i{{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}}
+.hero h1{{font-size:clamp(2.4rem,6vw,4.6rem);font-weight:700;letter-spacing:-.02em;max-width:16ch;background:linear-gradient(180deg,#fff 30%,#A9ADD0);-webkit-background-clip:text;background-clip:text;color:transparent}}
+.hero p.l{{font-size:clamp(1.05rem,1.6vw,1.25rem);color:var(--fg-2);max-width:56ch}}
+.row{{display:flex;flex-wrap:wrap;gap:12px}}
+.facts{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px;width:100%}}
+.facts div{{background:var(--panel);padding:16px 18px;display:grid;gap:2px}}
+.facts b{{font-family:var(--f-mono);font-size:1.6rem;font-weight:500}}
+.facts span{{font-size:13.5px;color:var(--muted)}}
+@media (max-width:700px){{.facts{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
+
+/* story */
+.story{{position:relative}}
+.story-g{{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px}}
+.chaps{{padding-block:10vh 30vh}}
+.chap{{min-height:72vh;display:grid;align-content:center;gap:12px;opacity:.35;transition:opacity .5s}}
+.chap.on{{opacity:1}}
+.chap .ck{{font-size:12.5px;color:var(--accent);letter-spacing:.15em}}
+.chap h3{{font-size:clamp(1.6rem,2.6vw,2.2rem);font-weight:700}}
+.chap p{{color:var(--fg-2);max-width:46ch}}
+.term{{margin:6px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--data);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;max-width:100%}}
+.stage{{position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100svh - 62px)}}
+#net{{width:100%;height:100%;display:block;direction:ltr}}
+.prog{{position:absolute;bottom:22px;inset-inline:10%;display:flex;gap:6px}}
+.prog i{{flex:1;height:3px;border-radius:3px;background:var(--line);overflow:hidden;position:relative}}
+.prog i b{{position:absolute;inset:0;background:linear-gradient(90deg,var(--accent),var(--data));transform:scaleX(0);transform-origin:right;transition:transform .4s}}
+.prog i.on b{{transform:scaleX(1)}}
+@media (max-width:900px){{
+  .story-g{{display:flex;flex-direction:column}}
+  .stage{{order:-1;top:62px;height:46vh;height:46svh;z-index:2;background:linear-gradient(var(--ink) 88%,transparent)}}
+  .chaps{{padding-top:0}}
+  .chap{{min-height:62vh}}
+  .prog{{display:none}}
+}}
+
+.sec{{padding-block:clamp(70px,10vw,120px)}}
+.sec-h{{display:grid;gap:10px;max-width:640px;margin-bottom:36px}}
+.eyb{{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.16em;color:var(--accent)}}
+.sec-h h2{{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:700}}
+.sec-h p{{color:var(--fg-2)}}
+.cards{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+@media (max-width:980px){{.cards{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
+@media (max-width:600px){{.cards{{grid-template-columns:minmax(0,1fr)}}}}
+.card{{display:grid;gap:10px;align-content:start;padding:20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--panel-2),var(--panel));transition:border-color .25s,transform .25s}}
+.card:hover{{border-color:rgba(140,140,255,.55);transform:translateY(-3px)}}
+.card-t{{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted)}}
+.st{{display:inline-flex;align-items:center;gap:6px}}
+.st i{{width:7px;height:7px;border-radius:50%;background:var(--muted)}}
+.st-data i{{background:var(--ok)}}.st-theory i{{background:var(--accent)}}.st-pending i{{background:var(--warm)}}
+.card h3{{font-size:1.15rem}}
+.card p{{font-size:14.5px;color:var(--fg-2);line-height:1.7}}
+.more{{font-size:13.5px;color:var(--accent);font-weight:600}}
+.method{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+.method div{{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--panel);display:grid;gap:8px}}
+.method b{{font-size:1.05rem}}
+.method p{{font-size:14.5px;color:var(--fg-2)}}
+.method .k{{font-family:var(--f-mono);font-size:12px}}
+.k.ok{{color:var(--ok)}}.k.ac{{color:var(--accent)}}.k.wm{{color:var(--warm)}}
+@media (max-width:860px){{.method{{grid-template-columns:minmax(0,1fr)}}}}
+.foot{{border-top:1px solid var(--line);padding-block:30px;color:var(--muted);font-size:14px}}
+.foot .wrap{{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}}
+@media (prefers-reduced-motion:reduce){{*{{transition:none!important;animation:none!important}}.chap{{opacity:1}}}}
+</style>
+</head>
+<body>
+<header class="top" id="top"><div class="wrap top-in">
+<a class="brand" href="./"><span class="logo" aria-hidden="true"></span>Fahad Net Lab</a>
+<nav class="nav" aria-label="الرئيسية"><a class="h" href="#story">الشبكة</a><a class="h" href="#guides">الأدلة</a><a class="h" href="#method">المنهجية</a><a href="{WP}" rel="noopener">المدونة</a></nav>
+</div></header>
+
+<main>
+<section class="hero"><div class="wrap">
+<span class="pill"><i></i>كل رقم هنا مقروء من ملف التقاط حقيقي</span>
+<h1>نبني الشبكة، ثم نقرأ كل حزمة فيها.</h1>
+<p class="l">منصة مشاريع فهد عواد في COS 370 و COS 372. تسع أدلة من الصفر، فيها البرامج والتثبيت والأوامر والمخطط والنتائج ومستكشف حزم يفكك كل بايت.</p>
+<div class="row"><a class="btn" href="#story">ابدأ القصة</a><a class="btn ghost" href="guides/ftp/">افتح أول دليل</a></div>
+<div class="facts"><div><b>9</b><span>أدلة مشاريع</span></div><div><b>6</b><span>ملفات التقاط محللة</span></div><div><b>{st['ping']['rep']}/{st['ping']['req']}</b><span>ردود ping ناجحة</span></div><div><b>{t1}→{t2}</b><span>TTL عبر الراوتر</span></div></div>
+</div></section>
+
+<section class="story" id="story" aria-label="بناء الشبكة خطوة بخطوة"><div class="wrap story-g">
+<div class="chaps">{chaps}</div>
+<div class="stage" aria-hidden="true"><canvas id="net"></canvas><div class="prog">{''.join('<i><b></b></i>' for _ in CH)}</div></div>
+</div></section>
+
+<section class="sec" id="guides"><div class="wrap">
+<div class="sec-h"><span class="eyb">GUIDES</span><h2>تسعة أدلة من الصفر</h2><p>كل دليل يبدأ بالبرامج وروابطها الرسمية، وينتهي بقائمة تحقق وملخص جاهز لـ LinkedIn.</p></div>
+<div class="cards">{''.join(cards)}</div>
+</div></section>
+
+<section class="sec" id="method" style="padding-top:0"><div class="wrap">
+<div class="sec-h"><span class="eyb">METHOD</span><h2>من أين تأتي الأرقام</h2><p>المنصة لا تكتب أي Seq أو Ack أو Hex باليد. سكربت يقرأ ملفات pcapng ويبني الصفحات منها، ويعيد كل الحسابات في كل مرة.</p></div>
+<div class="method">
+<div><span class="k ok">● من ملف التقاط</span><b>ستة مشاريع</b><p>النتائج ومستكشف الحزم والتحقق الآلي من TCP مقروءة من الإطارات مباشرة، ومع كل نتيجة رقم الإطار الذي جاءت منه.</p></div>
+<div><span class="k ac">● سيناريو نظري أو تقرير</span><b>ثلاثة مشاريع</b><p>Piggybacking وإعادة الإرسال وتاريخ Ethernet. القيم من التقرير، والحسابات الممكنة تُعاد آليًا.</p></div>
+<div><span class="k wm">● بانتظار ملف</span><b>Telnet</b><p>القيم معروضة كما في التقرير وموسومة بأنها غير متحقق منها، حتى يصل ملف الالتقاط.</p></div>
+</div>
+</div></section>
+</main>
+<footer class="foot"><div class="wrap"><span>© 2026 فهد عواد · Fahad Net Lab</span><span>جامعة الملك سعود · كلية علوم الحاسب التطبيقية</span></div></footer>
+
+<script>
+(function(){{
+const D = {story_json};
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const top = document.getElementById('top');
+addEventListener('scroll', () => top.classList.toggle('solid', scrollY > 30), {{passive:true}});
+
+const cv = document.getElementById('net'), ctx = cv.getContext('2d');
+const chaps = [...document.querySelectorAll('.chap')], bars = [...document.querySelectorAll('.prog i')];
+let stage = reduce ? 6 : 0, shown = reduce ? 6 : 0, w = 0, h = 0;
+const C = {{fg:'#EDEEF7', mut:'#7F85A6', line:'#2A2F48', ac:'#8C8CFF', data:'#45D2EC', warm:'#F2B65A', ok:'#4FD39A', panel:'#141726'}};
+// lab 1 (VMware) on the left/top, lab 2 (GNS3) appears at stage 6
+const N = {{
+  A: {{x:.18, y:.30, k:'pc',     t:'fahad-PC', s:'Windows 7',    ip:'189.120.0.57', mac:D.macs.A}},
+  B: {{x:.50, y:.30, k:'server', t:'Server',   s:'Windows Server', ip:'189.120.0.58', mac:D.macs.B}},
+  C: {{x:.82, y:.30, k:'pc',     t:'saif-PC',  s:'Windows 7',    ip:'189.120.0.59', mac:''}},
+  R: {{x:.50, y:.58, k:'router', t:'R c3725',  s:'Router on a Stick', ip:'.0.1 / .1.1', g:2}},
+  S1:{{x:.28, y:.74, k:'switch', t:'S1', s:'', ip:'', g:2}},
+  S2:{{x:.72, y:.74, k:'switch', t:'S2', s:'', ip:'', g:2}},
+  V1:{{x:.12, y:.92, k:'pc', t:'VLAN 10', s:'', ip:'189.120.0.61', g:2}},
+  V2:{{x:.88, y:.92, k:'pc', t:'VLAN 20', s:'', ip:'189.120.1.61', g:2}}
+}};
+const LINKS1 = [['A','B'],['B','C']], LINKS2 = [['R','S1',1],['S1','S2',1],['S1','V1'],['S2','V2']];
+function size(){{ const d = Math.min(2, devicePixelRatio||1); w = cv.clientWidth; h = cv.clientHeight; cv.width = w*d; cv.height = h*d; ctx.setTransform(d,0,0,d,0,0); }}
+let l2g = 0;
+const P = id => {{ const m = 30, top = 40; let y = N[id].y; if (!N[id].g) y = .46 + (y - .46) * 1 - .16 * l2g + (1 - l2g) * .0; if (!N[id].g) y = (1 - l2g) * .42 + l2g * N[id].y; return {{x: m + N[id].x*(w-2*m), y: top + y*(h-top-70)}}; }};
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v)), win = (v,a,b) => clamp((v-a)/(b-a),0,1);
+function rr(x,y,W,H,r){{ ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x,y,W,H,r) : ctx.rect(x,y,W,H); }}
+function glyph(k,x,y,s,a,lit){{
+  ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.lineWidth=1.6; ctx.strokeStyle = lit ? C.ac : '#3B4166'; ctx.fillStyle=C.panel;
+  if(k==='pc'){{ rr(-s*.8,-s*.6,s*1.6,s*1.0,4); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-s*.95,s*.6); ctx.lineTo(s*.95,s*.6); ctx.stroke(); }}
+  else if(k==='server'){{ rr(-s*.55,-s*.85,s*1.1,s*1.7,4); ctx.fill(); ctx.stroke(); for(let i=0;i<3;i++){{ ctx.beginPath(); ctx.moveTo(-s*.3,-s*.4+i*s*.4); ctx.lineTo(s*.15,-s*.4+i*s*.4); ctx.stroke(); ctx.fillStyle= lit?C.data:'#3B4166'; ctx.beginPath(); ctx.arc(s*.32,-s*.4+i*s*.4,2.2,0,7); ctx.fill(); ctx.fillStyle=C.panel; }} }}
+  else if(k==='switch'){{ rr(-s*1.1,-s*.35,s*2.2,s*.7,5); ctx.fill(); ctx.stroke(); for(let i=0;i<5;i++){{ ctx.fillStyle = lit && i%2===0 ? C.data : '#2A2F48'; ctx.fillRect(-s*.8+i*s*.36,-s*.09,s*.2,s*.18); }} }}
+  else {{ ctx.beginPath(); ctx.ellipse(0,s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); ctx.fillRect(-s*.9,-s*.2,s*1.8,s*.4); ctx.beginPath(); ctx.ellipse(0,-s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); }}
+  ctx.restore();
+}}
+function text(t,x,y,col,font,a){{ ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.font=font; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.restore(); }}
+function pill(t,x,y,col,a){{ ctx.save(); ctx.globalAlpha=a; ctx.font='600 11px "JetBrains Mono",monospace'; const tw=ctx.measureText(t).width+14; ctx.fillStyle='rgba(8,9,15,.9)'; ctx.strokeStyle=col; rr(x-tw/2,y-11,tw,20,10); ctx.fill(); ctx.stroke(); ctx.fillStyle=col; ctx.textAlign='center'; ctx.fillText(t,x,y+3.5); ctx.restore(); }}
+function along(a,b,k){{ const p=P(a), q=P(b); return {{x:p.x+(q.x-p.x)*k, y:p.y+(q.y-p.y)*k}}; }}
+
+function draw(time){{
+  const s = shown, sz = clamp(Math.min(w,h)*.05, 14, 28);
+  l2g = win(s,5.2,6);
+  ctx.clearRect(0,0,w,h);
+  // dotted ground
+  ctx.fillStyle='rgba(127,133,166,.14)';
+  for(let x=20;x<w;x+=24) for(let y=30;y<h-50;y+=24) ctx.fillRect(x,y,1.2,1.2);
+  // lab 1 links
+  const lk = win(s,.6,1.4);
+  LINKS1.forEach(([a,b]) => {{ const p=P(a), q=along(a,b,lk); if(lk<=0) return; ctx.save(); ctx.strokeStyle=C.ac; ctx.globalAlpha=.8; ctx.lineWidth=2; ctx.shadowColor=C.ac; ctx.shadowBlur=8; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); }});
+  if(lk>=1) text('VMware virtual network', (P('A').x+P('C').x)/2, P('A').y - sz*2.2, C.mut, '11px "JetBrains Mono",monospace', win(s,1.2,1.6));
+  // test: ARP then ICMP between A and B
+  const te = win(s,2.6,3.2) * (1 - win(s,3.8,4.2));
+  if(te>0){{
+    const ph = reduce ? .5 : (time/2200)%1;
+    if(ph<.35){{ const a=P('A'); ctx.save(); ctx.globalAlpha=te*(1-ph/.35); ctx.strokeStyle=C.warm; ctx.beginPath(); ctx.arc(a.x,a.y,sz+ph*sz*8,0,7); ctx.stroke(); ctx.restore(); pill('ARP who-has .58', a.x, a.y+sz*2.9, C.warm, te); }}
+    else {{ const k=(ph-.35)/.65, go = k<.5, q = go ? along('A','B',k*2) : along('B','A',(k-.5)*2); ctx.save(); ctx.globalAlpha=te; ctx.fillStyle=C.data; ctx.shadowColor=C.data; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,7); ctx.fill(); ctx.restore(); pill(go?'ICMP echo':'reply · TTL '+D.ttl, q.x, q.y-16, C.data, te); }}
+  }}
+  // services on server
+  const sv = win(s,3.6,4.2);
+  if(sv>0){{ const b=P('B'); ['FTP 21','SMTP 587','POP3 110','Telnet 23'].forEach((t,i)=> pill(t, b.x + (i-1.5)*Math.min(78,w/6), b.y + sz*4.6, C.ok, sv*(1-win(s,5.6,6)))); }}
+  // packet analysis: handshake ladder between A and B
+  const pa = win(s,4.6,5.2)*(1-win(s,5.8,6.2));
+  if(pa>0){{ const a=P('A'), b=P('B'); const y0=a.y+sz*2.6; ['SYN →','← SYN-ACK','ACK →'].forEach((t,i)=>{{ const y=y0+i*26; ctx.save(); ctx.globalAlpha=pa; ctx.strokeStyle= i===1?C.data:C.ac; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(a.x,y); ctx.lineTo(b.x,y); ctx.stroke(); ctx.restore(); text(t,(a.x+b.x)/2,y-6,C.fg2||C.fg,'600 11px "JetBrains Mono",monospace',pa); }}); }}
+  // lab 2
+  const l2 = win(s,5.4,6);
+  if(l2>0){{
+    const zone = (a,b,col) => {{ const p=P(a), q=P(b), cx=(p.x+q.x)/2, cy=(p.y+q.y)/2, r=Math.hypot(p.x-q.x,p.y-q.y)/2+sz*2; const g=ctx.createRadialGradient(cx,cy,r*.2,cx,cy,r); g.addColorStop(0,col.replace('1)', (.16*l2)+')')); g.addColorStop(1,col.replace('1)','0)')); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.fill(); }};
+    zone('S1','V1','rgba(140,140,255,1)'); zone('S2','V2','rgba(242,182,90,1)');
+    LINKS2.forEach(([a,b,tr]) => {{ const p=P(a), q=along(a,b,l2); ctx.save(); ctx.strokeStyle= tr? C.data : 'rgba(69,210,236,.5)'; ctx.lineWidth= tr?2.6:1.6; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); if(tr && l2>=1) text('802.1Q',(P(a).x+P(b).x)/2,(P(a).y+P(b).y)/2-8,C.mut,'10px "JetBrains Mono",monospace',1); }});
+    if(l2>=1){{ const ph = reduce ? .3 : (time/3000)%1; const path=[['V1','S1'],['S1','R'],['R','S1'],['S1','S2'],['S2','V2']]; const seg=Math.min(4,Math.floor(ph*5)), k=ph*5-seg; const q=along(path[seg][0],path[seg][1],k); const tag = seg<2 ? 'VID '+D.iv[0][0]+' · TTL '+D.iv[0][1] : 'VID '+D.iv[1][0]+' · TTL '+D.iv[1][1]; ctx.save(); ctx.fillStyle= seg<2?C.ac:C.warm; ctx.shadowColor=ctx.fillStyle; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,7); ctx.fill(); ctx.restore(); pill(tag,q.x,q.y-16, seg<2?C.ac:C.warm, 1); }}
+  }}
+  // nodes
+  Object.entries(N).forEach(([id,n],i) => {{
+    const a = n.g===2 ? l2 : (id==='A'? win(s,-.2,.3) : id==='B'? win(s,0,.5) : win(s,.2,.7));
+    if(a<=0) return;
+    const p=P(id); const ip = n.g===2 ? 1 : win(s,1.6,2.2);
+    glyph(n.k,p.x,p.y-(1-a)*18,sz,a, s>=1.5);
+    text(n.t,p.x,p.y+sz*1.5,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',a);
+    if(n.ip) text(n.ip,p.x,p.y+sz*1.5+15,C.data,'11px "JetBrains Mono",monospace',a*ip);
+    if(n.mac && w>560) text(n.mac,p.x,p.y+sz*1.5+29,C.mut,'10px "JetBrains Mono",monospace',a*ip*(1-win(s,2.6,3)));
+  }});
+}}
+function loop(t){{ shown += (stage - shown) * (reduce ? 1 : .06); draw(t); requestAnimationFrame(loop); }}
+size(); addEventListener('resize', size);
+if('IntersectionObserver' in window && !reduce){{
+  const io = new IntersectionObserver(es => es.forEach(e => {{ if(e.isIntersecting){{ stage = +e.target.dataset.stage; chaps.forEach(c => c.classList.toggle('on', c===e.target)); bars.forEach((b,i)=>b.classList.toggle('on', i<=stage)); }} }}), {{rootMargin:'-45% 0px -45% 0px'}});
+  chaps.forEach(c => io.observe(c));
+  chaps[0].classList.add('on'); bars[0].classList.add('on');
+}} else {{ chaps.forEach(c=>c.classList.add('on')); bars.forEach(b=>b.classList.add('on')); }}
+requestAnimationFrame(loop);
+}})();
+</script>
+</body></html>"""
+open(os.path.join(ROOT, "index.html"), "w").write(PAGE)
+print("index.html written")
