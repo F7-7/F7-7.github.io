@@ -91,7 +91,7 @@ code{font-family:var(--f-mono);font-size:.86em;background:var(--surface);border:
 .crumb{font-size:13.5px;color:var(--muted)}
 .crumb .mono{color:var(--accent);font-weight:600}
 .doc-head h1{font-size:clamp(1.9rem,3.4vw,2.6rem);font-weight:700;letter-spacing:-.01em}
-.en{font-size:14px;color:var(--muted);text-align:right}
+.en{font-size:14px;color:var(--muted);text-align:end}
 .lead{font-size:18.5px;color:var(--fg-2);max-width:62ch}
 .badge{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13.5px;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface);width:fit-content;max-width:100%}
 .badge .b-n{font-weight:400;color:var(--muted)}
@@ -106,7 +106,7 @@ code{font-family:var(--f-mono);font-size:.86em;background:var(--surface);border:
 .tool a{display:grid;gap:2px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--fg);background:var(--raise);transition:border-color .2s,transform .2s;height:100%}
 .tool a:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-1px)}
 .tool b{font-size:15.5px}.tool span{font-size:14px;color:var(--muted)}
-.tool .url{font-size:12px;color:var(--accent);text-align:right}
+.tool .url{font-size:12px;color:var(--accent);text-align:end}
 @media (max-width:620px){.tools{grid-template-columns:1fr}}
 
 .callout{border:1px solid var(--line);border-inline-start:3px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:12px 16px;font-size:15px;margin-block:12px}
@@ -190,7 +190,7 @@ details.err p{font-size:15px;color:var(--fg-2);margin-bottom:6px}
 .pn a{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:2px;color:var(--fg)}
 .pn a:hover{border-color:var(--accent);text-decoration:none}
 .pn span{font-size:13px;color:var(--muted)}
-.pn .nx{text-align:left}
+.pn .nx{text-align:end}
 
 /* packet explorer */
 .xp{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-block:14px;background:var(--raise)}
@@ -289,3 +289,10 @@ details.li{margin-top:22px;border:1px solid var(--line);border-radius:12px;paddi
 details.li summary{cursor:pointer;font-weight:600;padding:10px 0}
 .li-g{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:14px}
 @media (max-width:760px){.li-g{grid-template-columns:1fr}}
+
+/* language switch + LTR adjustments */
+.lang{font-size:13px;font-weight:600;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:5px 12px;text-decoration:none;white-space:nowrap}
+.lang:hover{border-color:var(--accent);color:var(--accent)}
+html[dir=ltr] .xp-tree .fl .nt{direction:ltr;text-align:left}
+html[dir=ltr] .flow-h span{direction:ltr}
+html[dir=ltr] body{font-family:"Inter","IBM Plex Sans Arabic",system-ui,sans-serif}

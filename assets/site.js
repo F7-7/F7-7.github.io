@@ -19,7 +19,7 @@
   $$('.copy').forEach(b => b.addEventListener('click', () => {
     const src = b.dataset.copy ? document.getElementById(b.dataset.copy) : b.closest('.code').querySelector('code');
     const text = src.innerText;
-    const done = () => { const t = b.textContent; b.textContent = b.closest('[lang="en"]') ? 'Copied' : 'تم النسخ'; b.classList.add('done'); setTimeout(() => { b.textContent = t; b.classList.remove('done'); }, 1600); };
+    const done = () => { const t = b.textContent; b.textContent = (b.closest('[lang]').getAttribute('lang') || 'en').startsWith('ar') ? 'تم النسخ' : 'Copied'; b.classList.add('done'); setTimeout(() => { b.textContent = t; b.classList.remove('done'); }, 1600); };
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(done).catch(() => {
       const r = document.createRange(); r.selectNodeContents(src); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
     });

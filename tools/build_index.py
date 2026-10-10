@@ -3,287 +3,293 @@
 import html, json, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
-from content import GUIDES
+import content as CA, content_en as CE
 from build import WP
 E = html.escape
 st = json.load(open(os.path.join(ROOT, "tools", "story.json")))
 (hs1, _), (hs2a, hs2b), (hs3a, hs3b) = st["hs"]
 (v1, t1), (v2, t2) = st["iv"]
 
-CH = [
- ("01", "الأجهزة", "نبدأ بثلاثة أجهزة افتراضية على VMware: عميل Windows 7، وخادم Windows Server، وعميل ثانٍ لاستقبال البريد.", "fahad-PC · Windows Server · saif-PC"),
- ("02", "الوصلات", "نضع البطاقات الثلاث على نفس الـ LAN Segment في VMware. لا يوجد راوتر بعد: كل الأجهزة في نفس نطاق البث.", "VMware LAN Segment"),
- ("03", "عناوين IP", "لكل جهاز عنوان ثابت من النطاق المخصص للطالب في المعمل، من 189.120.0.57 إلى 189.120.0.64.", f"A {st['macs']['A']}\nB {st['macs']['B']}"),
- ("04", "الاختبار الأول", f"قبل أي ping يسأل الجهاز عن MAC الخادم بـ ARP. بعدها أُرسلت {st['ping']['req']} طلبات ICMP ورجعت {st['ping']['rep']} ردود، كلها بـ TTL {st['ping']['ttl']}.", st["arp"][0] + "\n" + st["arp"][1]),
- ("05", "الخدمات", "على الخادم نشغّل الخدمات التي سنحللها، وكل خدمة تنتظر على منفذها.", "FTP 21 · SMTP 587 · POP3 110 · Telnet 23"),
- ("06", "تحليل الحزم", "نفتح Wireshark على الخادم ونقرأ المصافحة الثلاثية لجلسة FTP، ثم نفكك كل إطار بايتًا بايتًا.", f"SYN      Seq={hs1}\nSYN-ACK  Seq={hs2a} Ack={hs2b}\nACK      Seq={hs3a} Ack={hs3b}"),
- ("07", "VLAN والتوجيه", f"في المعمل الثاني نقسم الشبكة بسويتشين وراوتر في GNS3. نفس طلب ping عبر الـ Trunk مرتين: بوسم {v1} و TTL {t1}، ثم بوسم {v2} و TTL {t2}.", f"VID {v1} · TTL {t1}  →  R  →  VID {v2} · TTL {t2}"),
-]
+for LANG in ("en", "ar"):
+    T = (lambda ar, en: en) if LANG == "en" else (lambda ar, en: ar)
+    G = CE if LANG == "en" else CA
+    CH = [
+     ("01", T("الأجهزة", "Devices"), T("نبدأ بثلاثة أجهزة افتراضية على VMware: عميل Windows 7، وخادم Windows Server، وعميل ثانٍ لاستقبال البريد.", "We start with three virtual machines on VMware: a Windows 7 client, a Windows Server, and a second client to receive mail."), "fahad-PC · Windows Server · saif-PC"),
+     ("02", T("الوصلات", "Links"), T("نضع البطاقات الثلاث على نفس الـ LAN Segment في VMware. لا يوجد راوتر بعد: كل الأجهزة في نفس نطاق البث.", "All three adapters go on the same VMware LAN Segment. No router yet: every machine shares one broadcast domain."), "VMware LAN Segment"),
+     ("03", T("عناوين IP", "IP addresses"), T("لكل جهاز عنوان ثابت من النطاق المخصص للطالب في المعمل، من 189.120.0.57 إلى 189.120.0.64.", "Each machine gets a static address from the range assigned in the lab, 189.120.0.57 to 189.120.0.64."), f"A {st['macs']['A']}\nB {st['macs']['B']}"),
+     ("04", T("الاختبار الأول", "First test"), T(f"قبل أي ping يسأل الجهاز عن MAC الخادم بـ ARP. بعدها أُرسلت {st['ping']['req']} طلبات ICMP ورجعت {st['ping']['rep']} ردود، كلها بـ TTL {st['ping']['ttl']}.", f"Before any ping, the machine asks for the server's MAC with ARP. Then {st['ping']['req']} ICMP requests go out and {st['ping']['rep']} replies come back, all with TTL {st['ping']['ttl']}."), st["arp"][0] + "\n" + st["arp"][1]),
+     ("05", T("الخدمات", "Services"), T("على الخادم نشغّل الخدمات التي سنحللها، وكل خدمة تنتظر على منفذها.", "The server runs the services we will analyse, each listening on its own port."), "FTP 21 · SMTP 587 · POP3 110 · Telnet 23"),
+     ("06", T("تحليل الحزم", "Packet analysis"), T("نفتح Wireshark على الخادم ونقرأ المصافحة الثلاثية لجلسة FTP، ثم نفكك كل إطار بايتًا بايتًا.", "We open Wireshark on the server, read the FTP three-way handshake, then take every frame apart byte by byte."), f"SYN      Seq={hs1}\nSYN-ACK  Seq={hs2a} Ack={hs2b}\nACK      Seq={hs3a} Ack={hs3b}"),
+     ("07", T("VLAN والتوجيه", "VLANs and routing"), T(f"في المعمل الثاني نقسم الشبكة بسويتشين وراوتر في GNS3. نفس طلب ping عبر الـ Trunk مرتين: بوسم {v1} و TTL {t1}، ثم بوسم {v2} و TTL {t2}.", f"In the second lab we split the network with two switches and a router in GNS3. The same ping crosses the trunk twice: tag {v1} with TTL {t1}, then tag {v2} with TTL {t2}."), f"VID {v1} · TTL {t1}  →  R  →  VID {v2} · TTL {t2}"),
+    ]
 
-cards = []
-for g in sorted(GUIDES, key=lambda g: g["order"]):
-    cards.append(f'<a class="card" href="guides/{g["slug"]}/"><div class="card-t"><span class="mono">{g["course"]}</span><span class="mono">{g["order"]:02d}</span></div>'
-                 f'<h3>{E(g["title"])}</h3><p>{E(g["summary"])}</p><span class="more">ابدأ المشروع</span></a>')
+    cards = []
+    for g in sorted(G.GUIDES, key=lambda g: g["order"]):
+        cards.append(f'<a class="card" href="guides/{g["slug"]}/"><div class="card-t"><span class="mono">{g["course"]}</span><span class="mono">{g["order"]:02d}</span></div>'
+                     f'<h3>{E(g["title"])}</h3><p>{E(g["summary"])}</p><span class="more">{T("ابدأ المشروع", "Open the project")}</span></a>')
 
-chaps = "".join(f'<article class="chap" data-stage="{i}"><span class="ck mono">{n}</span><h3>{E(t)}</h3><p>{E(b)}</p><pre class="term mono" dir="ltr">{E(x)}</pre></article>' for i, (n, t, b, x) in enumerate(CH))
-ticker = "".join(f'<div class="sr p-{r["p"]}"><span>{r["no"]}</span><span>{r["t"]:.3f}</span><span>{r["src"]} → {r["dst"]}</span><span>{r["p"]}</span><span>{E(r["i"])}</span></div>' for r in st["ticker"])
-story_json = json.dumps({"macs": st["macs"], "ttl": st["ping"]["ttl"], "iv": st["iv"]})
+    chaps = "".join(f'<article class="chap" data-stage="{i}"><span class="ck mono">{n}</span><h3>{E(t)}</h3><p>{E(b)}</p><pre class="term mono" dir="ltr">{E(x)}</pre></article>' for i, (n, t, b, x) in enumerate(CH))
+    ticker = "".join(f'<div class="sr p-{r["p"]}"><span>{r["no"]}</span><span>{r["t"]:.3f}</span><span>{r["src"]} → {r["dst"]}</span><span>{r["p"]}</span><span>{E(r["i"])}</span></div>' for r in st["ticker"])
+    story_json = json.dumps({"macs": st["macs"], "ttl": st["ping"]["ttl"], "iv": st["iv"]})
 
-PAGE = f"""<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Fahad Net Lab · منصة مشاريع الشبكات</title>
-<meta name="description" content="منصة تعليمية تبني الشبكة خطوة بخطوة وتشرح كل حزمة من ملفات التقاط حقيقية. مشاريع COS 370 و COS 372 لفهد عواد.">
-<meta property="og:title" content="Fahad Net Lab"><meta property="og:description" content="نبني الشبكة ونفهم كل حزمة فيها، من ملفات التقاط حقيقية.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111433'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%237C83FF' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<style>
-/* Landing: one committed dark world. A sticky canvas draws the lab while chapters scroll past it. */
-:root{{--ink:#08090F;--panel:#0F111A;--panel-2:#141726;--line:#1E2235;--fg:#EDEEF7;--fg-2:#B9BDD6;--muted:#7F85A6;
-  --accent:#8C8CFF;--accent-2:#B4A5FF;--data:#45D2EC;--warm:#F2B65A;--ok:#4FD39A;
-  --f-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
-  --gutter:clamp(16px,4vw,48px);color-scheme:dark}}
-*{{box-sizing:border-box}}
-body{{margin:0;background:var(--ink);color:var(--fg);font-family:var(--f-ui);font-size:17px;line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased}}
-a{{color:inherit;text-decoration:none}}
-h1,h2,h3{{margin:0;line-height:1.25;text-wrap:balance}}
-p{{margin:0}}
-.mono{{font-family:var(--f-mono)}}
-:focus-visible{{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}}
-.wrap{{max-width:1240px;margin:0 auto;padding-inline:var(--gutter)}}
-.top{{position:fixed;top:0;inset-inline:0;z-index:20;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}}
-.top.solid{{background:rgba(8,9,15,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}}
-.top-in{{display:flex;align-items:center;gap:22px;height:62px}}
-.brand{{display:flex;align-items:center;gap:10px;font-weight:700}}
-.logo{{width:26px;height:26px;border-radius:8px;background:linear-gradient(140deg,var(--accent),var(--data))}}
-.nav{{display:flex;gap:4px;margin-inline-start:auto;font-size:14.5px}}
-.nav a{{color:var(--muted);padding:6px 12px;border-radius:8px}}
-.nav a:hover{{color:var(--fg);background:var(--panel-2)}}
-.btn{{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;background:var(--fg);color:var(--ink);transition:transform .2s,box-shadow .2s}}
-.btn:hover{{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(140,140,255,.7)}}
-.btn.ghost{{background:transparent;color:var(--fg);border:1px solid var(--line)}}
-@media (max-width:760px){{.nav a.h{{display:none}}}}
+    PAGE = f"""<!doctype html>
+    <html lang="{LANG}" dir="{T("rtl", "ltr")}">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <title>Fahad Net Lab · {T("منصة مشاريع الشبكات", "Networking projects")}</title>
+    <meta name="description" content="{T("منصة تعليمية تبني الشبكة خطوة بخطوة وتشرح كل حزمة من ملفات التقاط حقيقية. مشاريع COS 370 و COS 372 لفهد عواد.", "A learning platform that builds a network step by step and explains every packet from real captures. COS 370 and COS 372 projects by Fahad Awad.")}">
+    <meta property="og:title" content="Fahad Net Lab"><meta property="og:description" content="{T("نبني الشبكة ونفهم كل حزمة فيها، من ملفات التقاط حقيقية.", "Build the network, then understand every packet in it, from real captures.")}">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111433'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%237C83FF' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+    <style>
+    /* Landing: one committed dark world. A sticky canvas draws the lab while chapters scroll past it. */
+    :root{{--ink:#08090F;--panel:#0F111A;--panel-2:#141726;--line:#1E2235;--fg:#EDEEF7;--fg-2:#B9BDD6;--muted:#7F85A6;
+      --accent:#8C8CFF;--accent-2:#B4A5FF;--data:#45D2EC;--warm:#F2B65A;--ok:#4FD39A;
+      --f-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+      --gutter:clamp(16px,4vw,48px);color-scheme:dark}}
+    *{{box-sizing:border-box}}
+    body{{margin:0;background:var(--ink);color:var(--fg);font-family:var(--f-ui);font-size:17px;line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased}}
+    a{{color:inherit;text-decoration:none}}
+    h1,h2,h3{{margin:0;line-height:1.25;text-wrap:balance}}
+    p{{margin:0}}
+    .mono{{font-family:var(--f-mono)}}
+    :focus-visible{{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}}
+    .wrap{{max-width:1240px;margin:0 auto;padding-inline:var(--gutter)}}
+    .top{{position:fixed;top:0;inset-inline:0;z-index:20;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}}
+    .top.solid{{background:rgba(8,9,15,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}}
+    .top-in{{display:flex;align-items:center;gap:22px;height:62px}}
+    .brand{{display:flex;align-items:center;gap:10px;font-weight:700}}
+    .logo{{width:26px;height:26px;border-radius:8px;background:linear-gradient(140deg,var(--accent),var(--data))}}
+    .nav{{display:flex;gap:4px;margin-inline-start:auto;font-size:14.5px}}
+    .nav a{{color:var(--muted);padding:6px 12px;border-radius:8px}}
+    .nav a.lng{{color:var(--fg);border:1px solid var(--line);border-radius:999px;font-weight:600}}
+    .nav a:hover{{color:var(--fg);background:var(--panel-2)}}
+    .btn{{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;background:var(--fg);color:var(--ink);transition:transform .2s,box-shadow .2s}}
+    .btn:hover{{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(140,140,255,.7)}}
+    .btn.ghost{{background:transparent;color:var(--fg);border:1px solid var(--line)}}
+    @media (max-width:760px){{.nav a.h{{display:none}}}}
 
-.hero{{position:relative;padding:150px 0 70px;overflow:hidden}}
-.hero::before{{content:"";position:absolute;inset:-30% -10% auto;height:120%;background:radial-gradient(40% 50% at 70% 20%,rgba(140,140,255,.22),transparent 70%),radial-gradient(30% 40% at 25% 40%,rgba(69,210,236,.12),transparent 70%);pointer-events:none}}
-.hero-g{{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 48px;align-items:center}}
-.hero-t{{display:grid;gap:22px;justify-items:start;min-width:0}}
-.hero .facts{{grid-column:1/-1}}
-.shark{{min-width:0;border:1px solid var(--line);border-radius:14px;background:rgba(15,17,26,.85);box-shadow:0 40px 80px -30px rgba(140,140,255,.35),0 0 0 1px rgba(255,255,255,.02) inset;transform:perspective(1200px) rotateY(8deg) rotateX(4deg);overflow:hidden}}
-.shark-h{{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);direction:ltr}}
-.shark-h i{{width:10px;height:10px;border-radius:50%;background:#2A2F48}}
-.shark-h span{{margin-left:10px;font-size:12px;color:var(--muted)}}
-.shark-c{{font-size:11.5px;height:300px;overflow:hidden;position:relative}}
-.sr-h,.sr{{display:grid;grid-template-columns:34px 52px 200px 44px minmax(0,1fr);gap:8px;padding:5px 12px;white-space:nowrap}}
-.sr-h{{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2)}}
-.sr span{{overflow:hidden;text-overflow:ellipsis}}
-.sr{{color:var(--fg-2);border-bottom:1px solid rgba(30,34,53,.6)}}
-.sr.p-FTP span:nth-child(4){{color:var(--data)}}
-.sr.p-TCP span:nth-child(4){{color:var(--accent-2)}}
-.sr.on{{background:rgba(140,140,255,.16);color:#fff}}
-.sr-b{{animation:roll 24s linear infinite}}
-@keyframes roll{{0%,8%{{transform:translateY(0)}}100%{{transform:translateY(-50%)}}}}
-@media (max-width:900px){{.hero-g{{grid-template-columns:minmax(0,1fr)}}.shark{{transform:none}}}}
-.pill{{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--fg-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--panel)}}
-.pill i{{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}}
-.hero h1{{font-size:clamp(2.4rem,6vw,4.6rem);font-weight:700;letter-spacing:-.02em;max-width:16ch;background:linear-gradient(180deg,#fff 30%,#A9ADD0);-webkit-background-clip:text;background-clip:text;color:transparent}}
-.hero p.l{{font-size:clamp(1.05rem,1.6vw,1.25rem);color:var(--fg-2);max-width:56ch}}
-.row{{display:flex;flex-wrap:wrap;gap:12px}}
-.facts{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px;width:100%}}
-.facts div{{background:var(--panel);padding:16px 18px;display:grid;gap:2px}}
-.facts b{{text-align:right;font-family:var(--f-mono);font-size:1.6rem;font-weight:500}}
-.facts span{{font-size:13.5px;color:var(--muted)}}
-@media (max-width:700px){{.facts{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
+    .hero{{position:relative;padding:150px 0 70px;overflow:hidden}}
+    .hero::before{{content:"";position:absolute;inset:-30% -10% auto;height:120%;background:radial-gradient(40% 50% at 70% 20%,rgba(140,140,255,.22),transparent 70%),radial-gradient(30% 40% at 25% 40%,rgba(69,210,236,.12),transparent 70%);pointer-events:none}}
+    .hero-g{{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 48px;align-items:center}}
+    .hero-t{{display:grid;gap:22px;justify-items:start;min-width:0}}
+    .hero .facts{{grid-column:1/-1}}
+    .shark{{min-width:0;border:1px solid var(--line);border-radius:14px;background:rgba(15,17,26,.85);box-shadow:0 40px 80px -30px rgba(140,140,255,.35),0 0 0 1px rgba(255,255,255,.02) inset;transform:perspective(1200px) rotateY(8deg) rotateX(4deg);overflow:hidden}}
+    .shark-h{{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);direction:ltr}}
+    .shark-h i{{width:10px;height:10px;border-radius:50%;background:#2A2F48}}
+    .shark-h span{{margin-left:10px;font-size:12px;color:var(--muted)}}
+    .shark-c{{font-size:11.5px;height:300px;overflow:hidden;position:relative}}
+    .sr-h,.sr{{display:grid;grid-template-columns:34px 52px 200px 44px minmax(0,1fr);gap:8px;padding:5px 12px;white-space:nowrap}}
+    .sr-h{{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2)}}
+    .sr span{{overflow:hidden;text-overflow:ellipsis}}
+    .sr{{color:var(--fg-2);border-bottom:1px solid rgba(30,34,53,.6)}}
+    .sr.p-FTP span:nth-child(4){{color:var(--data)}}
+    .sr.p-TCP span:nth-child(4){{color:var(--accent-2)}}
+    .sr.on{{background:rgba(140,140,255,.16);color:#fff}}
+    .sr-b{{animation:roll 24s linear infinite}}
+    @keyframes roll{{0%,8%{{transform:translateY(0)}}100%{{transform:translateY(-50%)}}}}
+    @media (max-width:900px){{.hero-g{{grid-template-columns:minmax(0,1fr)}}.shark{{transform:none}}}}
+    .pill{{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--fg-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--panel)}}
+    .pill i{{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}}
+    .hero h1{{font-size:clamp(2.4rem,6vw,4.6rem);font-weight:700;letter-spacing:-.02em;max-width:16ch;background:linear-gradient(180deg,#fff 30%,#A9ADD0);-webkit-background-clip:text;background-clip:text;color:transparent}}
+    .hero p.l{{font-size:clamp(1.05rem,1.6vw,1.25rem);color:var(--fg-2);max-width:56ch}}
+    .row{{display:flex;flex-wrap:wrap;gap:12px}}
+    .facts{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px;width:100%}}
+    .facts div{{background:var(--panel);padding:16px 18px;display:grid;gap:2px}}
+    .facts b{{text-align:start;font-family:var(--f-mono);font-size:1.6rem;font-weight:500}}
+    .facts span{{font-size:13.5px;color:var(--muted)}}
+    @media (max-width:700px){{.facts{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
 
-/* story */
-.story{{position:relative}}
-.story-g{{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px}}
-.chaps{{padding-block:10vh 30vh}}
-.chap{{min-height:72vh;display:grid;align-content:center;gap:12px;opacity:.35;transition:opacity .5s}}
-.chap.on{{opacity:1}}
-.chap .ck{{font-size:12.5px;color:var(--accent);letter-spacing:.15em}}
-.chap h3{{font-size:clamp(1.6rem,2.6vw,2.2rem);font-weight:700}}
-.chap p{{color:var(--fg-2);max-width:46ch}}
-.term{{margin:6px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--data);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;max-width:100%}}
-.stage{{position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100svh - 62px)}}
-#net{{width:100%;height:100%;display:block;direction:ltr}}
-.prog{{position:absolute;bottom:22px;inset-inline:10%;display:flex;gap:6px}}
-.prog i{{flex:1;height:3px;border-radius:3px;background:var(--line);overflow:hidden;position:relative}}
-.prog i b{{position:absolute;inset:0;background:linear-gradient(90deg,var(--accent),var(--data));transform:scaleX(0);transform-origin:right;transition:transform .4s}}
-.prog i.on b{{transform:scaleX(1)}}
-@media (max-width:900px){{
-  .story-g{{display:flex;flex-direction:column}}
-  .stage{{order:-1;top:62px;height:46vh;height:46svh;z-index:2;background:linear-gradient(var(--ink) 88%,transparent)}}
-  .chaps{{padding-top:0}}
-  .chap{{min-height:70vh}}
-  .prog{{display:none}}
-}}
-
-.sec{{padding-block:clamp(70px,10vw,120px)}}
-.sec-h{{display:grid;gap:10px;max-width:640px;margin-bottom:36px}}
-.eyb{{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.16em;color:var(--accent)}}
-.sec-h h2{{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:700}}
-.sec-h p{{color:var(--fg-2)}}
-.cards{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
-@media (max-width:980px){{.cards{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
-@media (max-width:600px){{.cards{{grid-template-columns:minmax(0,1fr)}}}}
-.card{{display:grid;gap:10px;align-content:start;padding:20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--panel-2),var(--panel));transition:border-color .25s,transform .25s}}
-.card:hover{{border-color:rgba(140,140,255,.55);transform:translateY(-3px)}}
-.card-t{{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted)}}
-.st{{display:inline-flex;align-items:center;gap:6px}}
-.st i{{width:7px;height:7px;border-radius:50%;background:var(--muted)}}
-.st-data i{{background:var(--ok)}}.st-theory i{{background:var(--accent)}}.st-pending i{{background:var(--warm)}}
-.card h3{{font-size:1.15rem}}
-.card p{{font-size:14.5px;color:var(--fg-2);line-height:1.7}}
-.more{{font-size:13.5px;color:var(--accent);font-weight:600}}
-.method{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
-.method div{{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--panel);display:grid;gap:8px}}
-.method b{{font-size:1.05rem}}
-.method p{{font-size:14.5px;color:var(--fg-2)}}
-.method .k{{font-family:var(--f-mono);font-size:12px}}
-.k.ok{{color:var(--ok)}}.k.ac{{color:var(--accent)}}.k.wm{{color:var(--warm)}}
-@media (max-width:860px){{.method{{grid-template-columns:minmax(0,1fr)}}}}
-.foot{{border-top:1px solid var(--line);padding-block:30px;color:var(--muted);font-size:14px}}
-.foot .wrap{{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}}
-@media (prefers-reduced-motion:reduce){{*{{transition:none!important;animation:none!important}}.chap{{opacity:1}}}}
-</style>
-</head>
-<body>
-<header class="top" id="top"><div class="wrap top-in">
-<a class="brand" href="./"><span class="logo" aria-hidden="true"></span>Fahad Net Lab</a>
-<nav class="nav" aria-label="الرئيسية"><a class="h" href="#story">الشبكة</a><a class="h" href="#projects">المشاريع</a><a href="{WP}" rel="noopener">المدونة</a></nav>
-</div></header>
-
-<main>
-<section class="hero"><div class="wrap hero-g"><div class="hero-t">
-<h1>نبني الشبكة، ثم نقرأ كل حزمة فيها.</h1>
-<p class="l">تسعة مشاريع في بروتوكولات الشبكات ومحاكاتها. كل مشروع يبدأ من الصفر: البرامج، والإعداد، والأوامر، ثم نفتح الحزم ونقرأها بايتًا بايتًا.</p>
-<div class="row"><a class="btn" href="#story">شاهد الشبكة تُبنى</a><a class="btn ghost" href="#projects">المشاريع</a></div>
-</div>
-<div class="shark" aria-hidden="true"><div class="shark-h"><i></i><i></i><i></i><span class="mono">ftp.pcapng — Wireshark</span></div><div class="shark-c mono" dir="ltr"><div class="sr-h"><span>No.</span><span>Time</span><span>Source → Destination</span><span>Proto</span><span>Info</span></div><div class="sr-b">{ticker}{ticker}</div></div></div>
-<div class="facts"><div><b>9</b><span>مشاريع</span></div><div><b>9</b><span>بروتوكولات</span></div><div><b>{st['ping']['rep']}/{st['ping']['req']}</b><span>ردود ping</span></div><div><b dir="ltr">{t1} → {t2}</b><span>TTL عبر الراوتر</span></div></div>
-</div></section>
-
-<section class="story" id="story" aria-label="بناء الشبكة خطوة بخطوة"><div class="wrap story-g">
-<div class="chaps">{chaps}</div>
-<div class="stage" aria-hidden="true"><canvas id="net"></canvas><div class="prog">{''.join('<i><b></b></i>' for _ in CH)}</div></div>
-</div></section>
-
-<section class="sec" id="projects"><div class="wrap">
-<div class="sec-h"><span class="eyb">PROJECTS</span><h2>المشاريع</h2><p>اختر مشروعًا وامشِ معه خطوة بخطوة.</p></div>
-<div class="cards">{''.join(cards)}</div>
-</div></section>
-
-</main>
-<footer class="foot"><div class="wrap"><span>© 2026 فهد عواد · Fahad Net Lab</span><span>جامعة الملك سعود · كلية علوم الحاسب التطبيقية</span></div></footer>
-
-<script>
-(function(){{
-const D = {story_json};
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const top = document.getElementById('top');
-addEventListener('scroll', () => top.classList.toggle('solid', scrollY > 30), {{passive:true}});
-
-const cv = document.getElementById('net'), ctx = cv.getContext('2d');
-const chaps = [...document.querySelectorAll('.chap')], bars = [...document.querySelectorAll('.prog i')];
-let stage = 0, shown = 0, w = 0, h = 0;
-const C = {{fg:'#EDEEF7', mut:'#7F85A6', line:'#2A2F48', ac:'#8C8CFF', data:'#45D2EC', warm:'#F2B65A', ok:'#4FD39A', panel:'#141726'}};
-// scene 1: the VMware lab (stages 0-5). scene 2: the GNS3 lab (stage 6). Never both at once.
-const N = {{
-  A: {{x:.18, y:.42, k:'pc',     t:'fahad-PC', ip:'189.120.0.57', mac:D.macs.A}},
-  B: {{x:.50, y:.42, k:'server', t:'Server',   ip:'189.120.0.58', mac:D.macs.B}},
-  C: {{x:.82, y:.42, k:'pc',     t:'saif-PC',  ip:'189.120.0.59', mac:''}},
-  R: {{x:.50, y:.10, k:'router', t:'R1',   ip:'.0.1 · .1.1', g:2}},
-  S1:{{x:.27, y:.47, k:'switch', t:'ESW1', ip:'', g:2}},
-  S2:{{x:.73, y:.47, k:'switch', t:'ESW2', ip:'', g:2}},
-  V1:{{x:.14, y:.84, k:'pc', t:'PC A · VLAN 10', ip:'189.120.0.61', g:2}},
-  V2:{{x:.86, y:.84, k:'pc', t:'PC B · VLAN 20', ip:'189.120.1.61', g:2}}
-}};
-const LINKS1 = [['A','B'],['B','C']], LINKS2 = [['R','S1',1],['S1','S2',1],['S1','V1'],['S2','V2']];
-function size(){{ const d = Math.min(2, devicePixelRatio||1); w = cv.clientWidth; h = cv.clientHeight; cv.width = w*d; cv.height = h*d; ctx.setTransform(d,0,0,d,0,0); }}
-const P = id => {{ const m = Math.min(40, w*.08), top = 36, bot = w < 700 ? 40 : 70; return {{x: m + N[id].x*(w-2*m), y: top + N[id].y*(h-top-bot)}}; }};
-const clamp = (v,a,b) => Math.max(a, Math.min(b, v)), win = (v,a,b) => clamp((v-a)/(b-a),0,1);
-const only = (v,k) => clamp(1 - Math.abs(v-k)*2.4, 0, 1);   // visible only around stage k
-function rr(x,y,W,H,r){{ ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x,y,W,H,r) : ctx.rect(x,y,W,H); }}
-function glyph(k,x,y,s,a,lit){{
-  ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.lineWidth=1.6; ctx.strokeStyle = lit ? C.ac : '#3B4166'; ctx.fillStyle=C.panel;
-  if(k==='pc'){{ rr(-s*.8,-s*.6,s*1.6,s*1.0,4); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-s*.95,s*.6); ctx.lineTo(s*.95,s*.6); ctx.stroke(); }}
-  else if(k==='server'){{ rr(-s*.55,-s*.85,s*1.1,s*1.7,4); ctx.fill(); ctx.stroke(); for(let i=0;i<3;i++){{ ctx.beginPath(); ctx.moveTo(-s*.3,-s*.4+i*s*.4); ctx.lineTo(s*.15,-s*.4+i*s*.4); ctx.stroke(); ctx.fillStyle= lit?C.data:'#3B4166'; ctx.beginPath(); ctx.arc(s*.32,-s*.4+i*s*.4,2.2,0,7); ctx.fill(); ctx.fillStyle=C.panel; }} }}
-  else if(k==='switch'){{ rr(-s*1.1,-s*.35,s*2.2,s*.7,5); ctx.fill(); ctx.stroke(); for(let i=0;i<5;i++){{ ctx.fillStyle = lit && i%2===0 ? C.data : '#2A2F48'; ctx.fillRect(-s*.8+i*s*.36,-s*.09,s*.2,s*.18); }} }}
-  else {{ ctx.beginPath(); ctx.ellipse(0,s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); ctx.fillRect(-s*.9,-s*.2,s*1.8,s*.4); ctx.beginPath(); ctx.ellipse(0,-s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); }}
-  ctx.restore();
-}}
-function text(t,x,y,col,font,a){{ if(a<=0) return; ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.font=font; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.restore(); }}
-function pill(t,x,y,col,a){{ if(a<=0) return; ctx.save(); ctx.globalAlpha=a; ctx.font='600 11px "JetBrains Mono",monospace'; const tw=ctx.measureText(t).width+16; x = clamp(x, tw/2+4, w-tw/2-4); ctx.fillStyle='rgba(8,9,15,.92)'; ctx.strokeStyle=col; rr(x-tw/2,y-11,tw,22,11); ctx.fill(); ctx.stroke(); ctx.fillStyle=col; ctx.textAlign='center'; ctx.fillText(t,x,y+4); ctx.restore(); }}
-function along(a,b,k){{ const p=P(a), q=P(b); return {{x:p.x+(q.x-p.x)*k, y:p.y+(q.y-p.y)*k}}; }}
-function dot(q,col,a){{ ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,7); ctx.fill(); ctx.restore(); }}
-
-function draw(time){{
-  const s = shown, sz = clamp(Math.min(w,h)*.05, 14, 26), small = w < 520;
-  const L1 = 1 - win(s,5.3,5.8), L2 = win(s,5.6,6);
-  ctx.clearRect(0,0,w,h);
-  ctx.fillStyle='rgba(127,133,166,.12)';
-  for(let x=20;x<w;x+=24) for(let y=24;y<h-30;y+=24) ctx.fillRect(x,y,1.2,1.2);
-  const mono = px => px+'px "JetBrains Mono",monospace';
-
-  if(L1>0){{
-    const a = P('A'), b = P('B'), above = a.y - sz*2.4;
-    // links grow at stage 1
-    const lk = win(s,.6,1.3);
-    LINKS1.forEach(([x,y]) => {{ if(lk<=0) return; const p=P(x), q=along(x,y,lk); ctx.save(); ctx.globalAlpha=.8*L1; ctx.strokeStyle=C.ac; ctx.lineWidth=2; ctx.shadowColor=C.ac; ctx.shadowBlur=8; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); }});
-    // one overlay at a time, each in the band above the line
-    text('VMware LAN Segment', b.x, above, C.mut, mono(11), only(s,1)*L1);
-    const te = only(s,3)*L1;
-    if(te>0){{
-      const ph = reduce ? .6 : (time/2400)%1;
-      if(ph<.3){{ ctx.save(); ctx.globalAlpha=te*(1-ph/.3); ctx.strokeStyle=C.warm; ctx.beginPath(); ctx.arc(a.x,a.y,sz+ph*sz*6,0,7); ctx.stroke(); ctx.restore(); pill('ARP · who has .58?', (a.x+b.x)/2, above, C.warm, te); }}
-      else {{ const k=(ph-.3)/.7, go=k<.5; dot(go ? along('A','B',k*2) : along('B','A',(k-.5)*2), C.data, te); pill(go ? 'ICMP echo request' : 'echo reply · TTL '+D.ttl, (a.x+b.x)/2, above, C.data, te); }}
+    /* story */
+    .story{{position:relative}}
+    .story-g{{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px}}
+    .chaps{{padding-block:10vh 30vh}}
+    .chap{{min-height:72vh;display:grid;align-content:center;gap:12px;opacity:.35;transition:opacity .5s}}
+    .chap.on{{opacity:1}}
+    .chap .ck{{font-size:12.5px;color:var(--accent);letter-spacing:.15em}}
+    .chap h3{{font-size:clamp(1.6rem,2.6vw,2.2rem);font-weight:700}}
+    .chap p{{color:var(--fg-2);max-width:46ch}}
+    .term{{margin:6px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--data);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;max-width:100%}}
+    .stage{{position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100svh - 62px)}}
+    #net{{width:100%;height:100%;display:block;direction:ltr}}
+    .prog{{position:absolute;bottom:22px;inset-inline:10%;display:flex;gap:6px}}
+    .prog i{{flex:1;height:3px;border-radius:3px;background:var(--line);overflow:hidden;position:relative}}
+    .prog i b{{position:absolute;inset:0;background:linear-gradient(90deg,var(--accent),var(--data));transform:scaleX(0);transform-origin:right;transition:transform .4s}}
+    .prog i.on b{{transform:scaleX(1)}}
+    @media (max-width:900px){{
+      .story-g{{display:flex;flex-direction:column}}
+      .stage{{order:-1;top:62px;height:46vh;height:46svh;z-index:2;background:linear-gradient(var(--ink) 88%,transparent)}}
+      .chaps{{padding-top:0}}
+      .chap{{min-height:70vh}}
+      .prog{{display:none}}
     }}
-    const sv = only(s,4)*L1;
-    if(sv>0){{ const t=['FTP 21','SMTP 587','POP3 110','Telnet 23'];
-      if(small) t.forEach((x,i)=> pill(x, b.x + (i%2 ? 1 : -1)*46, above - sz*1.2 + Math.floor(i/2)*26 - 26, C.ok, sv));
-      else t.forEach((x,i)=> pill(x, b.x + (i-1.5)*84, above, C.ok, sv)); }}
-    const pa = only(s,5)*L1;
-    if(pa>0){{ const y0 = a.y + sz*1.5 + 46; ['SYN  →','←  SYN-ACK','ACK  →'].forEach((t,i)=>{{ const y=y0+i*28, k = reduce ? 1 : clamp(((time/900)%4) - i, 0, 1); ctx.save(); ctx.globalAlpha=pa; ctx.strokeStyle= i===1?C.data:C.ac; ctx.setLineDash([4,4]); ctx.beginPath(); const fx = i===1 ? b.x : a.x, tx = i===1 ? a.x : b.x; ctx.moveTo(fx,y); ctx.lineTo(fx+(tx-fx)*k,y); ctx.stroke(); ctx.restore(); text(t,(a.x+b.x)/2,y-7,C.fg,'600 '+mono(11),pa*(k>0?1:.3)); }}); }}
-    // nodes
-    ['A','B','C'].forEach(id => {{
-      const n=N[id], p=P(id), na = (id==='A'? win(s,-.2,.3) : id==='B'? win(s,0,.5) : win(s,.2,.7)) * L1;
-      if(na<=0) return;
-      glyph(n.k,p.x,p.y-(1-na)*18,sz,na, s>=1.5);
-      text(n.t,p.x,p.y+sz*1.5,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',na);
-      text(n.ip,p.x,p.y+sz*1.5+16,C.data,mono(small?10:11),na*win(s,1.6,2.2));
-      if(n.mac && !small) text(n.mac,p.x,p.y+sz*1.5+31,C.mut,mono(10),na*only(s,2));
-    }});
-  }}
 
-  if(L2>0){{
-    const zone = (a,b,col) => {{ const p=P(a), q=P(b), cx=(p.x+q.x)/2, cy=(p.y+q.y)/2, r=Math.hypot(p.x-q.x,p.y-q.y)/2+sz*2; const g=ctx.createRadialGradient(cx,cy,r*.2,cx,cy,r); g.addColorStop(0,col+(.16*L2)+')'); g.addColorStop(1,col+'0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.fill(); }};
-    zone('S1','V1','rgba(140,140,255,'); zone('S2','V2','rgba(242,182,90,');
-    LINKS2.forEach(([a,b,tr]) => {{ const p=P(a), q=along(a,b,L2); ctx.save(); ctx.globalAlpha=L2; ctx.strokeStyle= tr? C.data : 'rgba(69,210,236,.5)'; ctx.lineWidth= tr?2.6:1.6; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); }});
-    ['R','S1','S2','V1','V2'].forEach(id => {{
-      const n=N[id], p=P(id);
-      glyph(n.k,p.x,p.y,sz,L2,true);
-      const below = n.k==='switch' ? sz*1.3 : sz*1.5, side = id==='R', tx = side ? p.x + sz*1.4 + 44 : p.x, ty = side ? p.y - 4 : p.y+below;
-      text(n.t,tx,ty,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',L2);
-      if(n.ip) text(n.ip,tx,ty+16,C.data,mono(small?10:11),L2);
-    }});
-    if(L2>=1){{ const ph = reduce ? .3 : (time/3200)%1; const path=[['V1','S1'],['S1','R'],['R','S1'],['S1','S2'],['S2','V2']]; const seg=Math.min(4,Math.floor(ph*5)), k=ph*5-seg; const q=along(path[seg][0],path[seg][1],k); const v = seg<2 ? 0 : 1, col = v ? C.warm : C.ac;
-      dot(q,col,1); const r=P('R'); pill('VID '+D.iv[v][0]+' · TTL '+D.iv[v][1], r.x, (r.y+P('S1').y)/2 + 6, col, 1); }}
-  }}
-}}
-function loop(t){{ shown += (stage - shown) * (reduce ? 1 : .06); draw(t); requestAnimationFrame(loop); }}
-size(); addEventListener('resize', size);
-if('IntersectionObserver' in window){{
-  const io = new IntersectionObserver(es => es.forEach(e => {{ if(e.isIntersecting){{ stage = +e.target.dataset.stage; chaps.forEach(c => c.classList.toggle('on', c===e.target)); bars.forEach((b,i)=>b.classList.toggle('on', i<=stage)); }} }}), {{rootMargin: matchMedia('(max-width:900px)').matches ? '-62% 0px -28% 0px' : '-45% 0px -45% 0px'}});
-  chaps.forEach(c => io.observe(c));
-  chaps[0].classList.add('on'); bars[0].classList.add('on');
-}} else {{ chaps.forEach(c=>c.classList.add('on')); bars.forEach(b=>b.classList.add('on')); }}
-requestAnimationFrame(loop);
-}})();
-</script>
-</body></html>"""
-open(os.path.join(ROOT, "index.html"), "w").write(PAGE)
+    .sec{{padding-block:clamp(70px,10vw,120px)}}
+    .sec-h{{display:grid;gap:10px;max-width:640px;margin-bottom:36px}}
+    .eyb{{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.16em;color:var(--accent)}}
+    .sec-h h2{{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:700}}
+    .sec-h p{{color:var(--fg-2)}}
+    .cards{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+    @media (max-width:980px){{.cards{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
+    @media (max-width:600px){{.cards{{grid-template-columns:minmax(0,1fr)}}}}
+    .card{{display:grid;gap:10px;align-content:start;padding:20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--panel-2),var(--panel));transition:border-color .25s,transform .25s}}
+    .card:hover{{border-color:rgba(140,140,255,.55);transform:translateY(-3px)}}
+    .card-t{{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted)}}
+    .st{{display:inline-flex;align-items:center;gap:6px}}
+    .st i{{width:7px;height:7px;border-radius:50%;background:var(--muted)}}
+    .st-data i{{background:var(--ok)}}.st-theory i{{background:var(--accent)}}.st-pending i{{background:var(--warm)}}
+    .card h3{{font-size:1.15rem}}
+    .card p{{font-size:14.5px;color:var(--fg-2);line-height:1.7}}
+    .more{{font-size:13.5px;color:var(--accent);font-weight:600}}
+    .method{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+    .method div{{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--panel);display:grid;gap:8px}}
+    .method b{{font-size:1.05rem}}
+    .method p{{font-size:14.5px;color:var(--fg-2)}}
+    .method .k{{font-family:var(--f-mono);font-size:12px}}
+    .k.ok{{color:var(--ok)}}.k.ac{{color:var(--accent)}}.k.wm{{color:var(--warm)}}
+    @media (max-width:860px){{.method{{grid-template-columns:minmax(0,1fr)}}}}
+    .foot{{border-top:1px solid var(--line);padding-block:30px;color:var(--muted);font-size:14px}}
+    .foot .wrap{{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}}
+    @media (prefers-reduced-motion:reduce){{*{{transition:none!important;animation:none!important}}.chap{{opacity:1}}}}
+    </style>
+    </head>
+    <body>
+    <header class="top" id="top"><div class="wrap top-in">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true"></span>Fahad Net Lab</a>
+    <nav class="nav" aria-label="{T("الرئيسية", "Main")}"><a class="h" href="#story">{T("الشبكة", "The network")}</a><a class="h" href="#projects">{T("المشاريع", "Projects")}</a><a class="h" href="{WP}" rel="noopener">{T("المدونة", "Blog")}</a><a class="lng" href="{T("../", "ar/")}" lang="{T("en", "ar")}">{T("English", "العربية")}</a></nav>
+    </div></header>
+
+    <main>
+    <section class="hero"><div class="wrap hero-g"><div class="hero-t">
+    <h1>{T("نبني الشبكة، ثم نقرأ كل حزمة فيها.", "Build the network. Then read every packet in it.")}</h1>
+    <p class="l">{T("تسعة مشاريع في بروتوكولات الشبكات ومحاكاتها. كل مشروع يبدأ من الصفر: البرامج، والإعداد، والأوامر، ثم نفتح الحزم ونقرأها بايتًا بايتًا.", "Nine projects in network protocols and simulation. Each one starts from zero: the software, the setup, the commands, then we open the packets and read them byte by byte.")}</p>
+    <div class="row"><a class="btn" href="#story">{T("شاهد الشبكة تُبنى", "Watch it being built")}</a><a class="btn ghost" href="#projects">{T("المشاريع", "Projects")}</a></div>
+    </div>
+    <div class="shark" aria-hidden="true"><div class="shark-h"><i></i><i></i><i></i><span class="mono">ftp.pcapng — Wireshark</span></div><div class="shark-c mono" dir="ltr"><div class="sr-h"><span>No.</span><span>Time</span><span>Source → Destination</span><span>Proto</span><span>Info</span></div><div class="sr-b">{ticker}{ticker}</div></div></div>
+    <div class="facts"><div><b>9</b><span>{T("مشاريع", "projects")}</span></div><div><b>9</b><span>{T("بروتوكولات", "protocols")}</span></div><div><b>{st['ping']['rep']}/{st['ping']['req']}</b><span>{T("ردود ping", "ping replies")}</span></div><div><b dir="ltr">{t1} → {t2}</b><span>{T("TTL عبر الراوتر", "TTL across the router")}</span></div></div>
+    </div></section>
+
+    <section class="story" id="story" aria-label="{T("بناء الشبكة خطوة بخطوة", "Building the network step by step")}"><div class="wrap story-g">
+    <div class="chaps">{chaps}</div>
+    <div class="stage" aria-hidden="true"><canvas id="net"></canvas><div class="prog">{''.join('<i><b></b></i>' for _ in CH)}</div></div>
+    </div></section>
+
+    <section class="sec" id="projects"><div class="wrap">
+    <div class="sec-h"><span class="eyb">PROJECTS</span><h2>{T("المشاريع", "Projects")}</h2><p>{T("اختر مشروعًا وامشِ معه خطوة بخطوة.", "Pick a project and follow it step by step.")}</p></div>
+    <div class="cards">{''.join(cards)}</div>
+    </div></section>
+
+    </main>
+    <footer class="foot"><div class="wrap"><span>© 2026 {T("فهد عواد", "Fahad Awad")} · Fahad Net Lab</span><span>{T("جامعة الملك سعود · كلية علوم الحاسب التطبيقية", "King Saud University · College of Applied Computer Science")}</span></div></footer>
+
+    <script>
+    (function(){{
+    const D = {story_json};
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const top = document.getElementById('top');
+    addEventListener('scroll', () => top.classList.toggle('solid', scrollY > 30), {{passive:true}});
+
+    const cv = document.getElementById('net'), ctx = cv.getContext('2d');
+    const chaps = [...document.querySelectorAll('.chap')], bars = [...document.querySelectorAll('.prog i')];
+    let stage = 0, shown = 0, w = 0, h = 0;
+    const C = {{fg:'#EDEEF7', mut:'#7F85A6', line:'#2A2F48', ac:'#8C8CFF', data:'#45D2EC', warm:'#F2B65A', ok:'#4FD39A', panel:'#141726'}};
+    // scene 1: the VMware lab (stages 0-5). scene 2: the GNS3 lab (stage 6). Never both at once.
+    const N = {{
+      A: {{x:.18, y:.42, k:'pc',     t:'fahad-PC', ip:'189.120.0.57', mac:D.macs.A}},
+      B: {{x:.50, y:.42, k:'server', t:'Server',   ip:'189.120.0.58', mac:D.macs.B}},
+      C: {{x:.82, y:.42, k:'pc',     t:'saif-PC',  ip:'189.120.0.59', mac:''}},
+      R: {{x:.50, y:.10, k:'router', t:'R1',   ip:'.0.1 · .1.1', g:2}},
+      S1:{{x:.27, y:.47, k:'switch', t:'ESW1', ip:'', g:2}},
+      S2:{{x:.73, y:.47, k:'switch', t:'ESW2', ip:'', g:2}},
+      V1:{{x:.14, y:.84, k:'pc', t:'PC A · VLAN 10', ip:'189.120.0.61', g:2}},
+      V2:{{x:.86, y:.84, k:'pc', t:'PC B · VLAN 20', ip:'189.120.1.61', g:2}}
+    }};
+    const LINKS1 = [['A','B'],['B','C']], LINKS2 = [['R','S1',1],['S1','S2',1],['S1','V1'],['S2','V2']];
+    function size(){{ const d = Math.min(2, devicePixelRatio||1); w = cv.clientWidth; h = cv.clientHeight; cv.width = w*d; cv.height = h*d; ctx.setTransform(d,0,0,d,0,0); }}
+    const P = id => {{ const m = Math.min(40, w*.08), top = 36, bot = w < 700 ? 40 : 70; return {{x: m + N[id].x*(w-2*m), y: top + N[id].y*(h-top-bot)}}; }};
+    const clamp = (v,a,b) => Math.max(a, Math.min(b, v)), win = (v,a,b) => clamp((v-a)/(b-a),0,1);
+    const only = (v,k) => clamp(1 - Math.abs(v-k)*2.4, 0, 1);   // visible only around stage k
+    function rr(x,y,W,H,r){{ ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x,y,W,H,r) : ctx.rect(x,y,W,H); }}
+    function glyph(k,x,y,s,a,lit){{
+      ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.lineWidth=1.6; ctx.strokeStyle = lit ? C.ac : '#3B4166'; ctx.fillStyle=C.panel;
+      if(k==='pc'){{ rr(-s*.8,-s*.6,s*1.6,s*1.0,4); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-s*.95,s*.6); ctx.lineTo(s*.95,s*.6); ctx.stroke(); }}
+      else if(k==='server'){{ rr(-s*.55,-s*.85,s*1.1,s*1.7,4); ctx.fill(); ctx.stroke(); for(let i=0;i<3;i++){{ ctx.beginPath(); ctx.moveTo(-s*.3,-s*.4+i*s*.4); ctx.lineTo(s*.15,-s*.4+i*s*.4); ctx.stroke(); ctx.fillStyle= lit?C.data:'#3B4166'; ctx.beginPath(); ctx.arc(s*.32,-s*.4+i*s*.4,2.2,0,7); ctx.fill(); ctx.fillStyle=C.panel; }} }}
+      else if(k==='switch'){{ rr(-s*1.1,-s*.35,s*2.2,s*.7,5); ctx.fill(); ctx.stroke(); for(let i=0;i<5;i++){{ ctx.fillStyle = lit && i%2===0 ? C.data : '#2A2F48'; ctx.fillRect(-s*.8+i*s*.36,-s*.09,s*.2,s*.18); }} }}
+      else {{ ctx.beginPath(); ctx.ellipse(0,s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); ctx.fillRect(-s*.9,-s*.2,s*1.8,s*.4); ctx.beginPath(); ctx.ellipse(0,-s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); }}
+      ctx.restore();
+    }}
+    function text(t,x,y,col,font,a){{ if(a<=0) return; ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.font=font; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.restore(); }}
+    function pill(t,x,y,col,a){{ if(a<=0) return; ctx.save(); ctx.globalAlpha=a; ctx.font='600 11px "JetBrains Mono",monospace'; const tw=ctx.measureText(t).width+16; x = clamp(x, tw/2+4, w-tw/2-4); ctx.fillStyle='rgba(8,9,15,.92)'; ctx.strokeStyle=col; rr(x-tw/2,y-11,tw,22,11); ctx.fill(); ctx.stroke(); ctx.fillStyle=col; ctx.textAlign='center'; ctx.fillText(t,x,y+4); ctx.restore(); }}
+    function along(a,b,k){{ const p=P(a), q=P(b); return {{x:p.x+(q.x-p.x)*k, y:p.y+(q.y-p.y)*k}}; }}
+    function dot(q,col,a){{ ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,7); ctx.fill(); ctx.restore(); }}
+
+    function draw(time){{
+      const s = shown, sz = clamp(Math.min(w,h)*.05, 14, 26), small = w < 520;
+      const L1 = 1 - win(s,5.3,5.8), L2 = win(s,5.6,6);
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle='rgba(127,133,166,.12)';
+      for(let x=20;x<w;x+=24) for(let y=24;y<h-30;y+=24) ctx.fillRect(x,y,1.2,1.2);
+      const mono = px => px+'px "JetBrains Mono",monospace';
+
+      if(L1>0){{
+        const a = P('A'), b = P('B'), above = a.y - sz*2.4;
+        // links grow at stage 1
+        const lk = win(s,.6,1.3);
+        LINKS1.forEach(([x,y]) => {{ if(lk<=0) return; const p=P(x), q=along(x,y,lk); ctx.save(); ctx.globalAlpha=.8*L1; ctx.strokeStyle=C.ac; ctx.lineWidth=2; ctx.shadowColor=C.ac; ctx.shadowBlur=8; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); }});
+        // one overlay at a time, each in the band above the line
+        text('VMware LAN Segment', b.x, above, C.mut, mono(11), only(s,1)*L1);
+        const te = only(s,3)*L1;
+        if(te>0){{
+          const ph = reduce ? .6 : (time/2400)%1;
+          if(ph<.3){{ ctx.save(); ctx.globalAlpha=te*(1-ph/.3); ctx.strokeStyle=C.warm; ctx.beginPath(); ctx.arc(a.x,a.y,sz+ph*sz*6,0,7); ctx.stroke(); ctx.restore(); pill('ARP · who has .58?', (a.x+b.x)/2, above, C.warm, te); }}
+          else {{ const k=(ph-.3)/.7, go=k<.5; dot(go ? along('A','B',k*2) : along('B','A',(k-.5)*2), C.data, te); pill(go ? 'ICMP echo request' : 'echo reply · TTL '+D.ttl, (a.x+b.x)/2, above, C.data, te); }}
+        }}
+        const sv = only(s,4)*L1;
+        if(sv>0){{ const t=['FTP 21','SMTP 587','POP3 110','Telnet 23'];
+          if(small) t.forEach((x,i)=> pill(x, b.x + (i%2 ? 1 : -1)*46, above - sz*1.2 + Math.floor(i/2)*26 - 26, C.ok, sv));
+          else t.forEach((x,i)=> pill(x, b.x + (i-1.5)*84, above, C.ok, sv)); }}
+        const pa = only(s,5)*L1;
+        if(pa>0){{ const y0 = a.y + sz*1.5 + 46; ['SYN  →','←  SYN-ACK','ACK  →'].forEach((t,i)=>{{ const y=y0+i*28, k = reduce ? 1 : clamp(((time/900)%4) - i, 0, 1); ctx.save(); ctx.globalAlpha=pa; ctx.strokeStyle= i===1?C.data:C.ac; ctx.setLineDash([4,4]); ctx.beginPath(); const fx = i===1 ? b.x : a.x, tx = i===1 ? a.x : b.x; ctx.moveTo(fx,y); ctx.lineTo(fx+(tx-fx)*k,y); ctx.stroke(); ctx.restore(); text(t,(a.x+b.x)/2,y-7,C.fg,'600 '+mono(11),pa*(k>0?1:.3)); }}); }}
+        // nodes
+        ['A','B','C'].forEach(id => {{
+          const n=N[id], p=P(id), na = (id==='A'? win(s,-.2,.3) : id==='B'? win(s,0,.5) : win(s,.2,.7)) * L1;
+          if(na<=0) return;
+          glyph(n.k,p.x,p.y-(1-na)*18,sz,na, s>=1.5);
+          text(n.t,p.x,p.y+sz*1.5,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',na);
+          text(n.ip,p.x,p.y+sz*1.5+16,C.data,mono(small?10:11),na*win(s,1.6,2.2));
+          if(n.mac && !small) text(n.mac,p.x,p.y+sz*1.5+31,C.mut,mono(10),na*only(s,2));
+        }});
+      }}
+
+      if(L2>0){{
+        const zone = (a,b,col) => {{ const p=P(a), q=P(b), cx=(p.x+q.x)/2, cy=(p.y+q.y)/2, r=Math.hypot(p.x-q.x,p.y-q.y)/2+sz*2; const g=ctx.createRadialGradient(cx,cy,r*.2,cx,cy,r); g.addColorStop(0,col+(.16*L2)+')'); g.addColorStop(1,col+'0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.fill(); }};
+        zone('S1','V1','rgba(140,140,255,'); zone('S2','V2','rgba(242,182,90,');
+        LINKS2.forEach(([a,b,tr]) => {{ const p=P(a), q=along(a,b,L2); ctx.save(); ctx.globalAlpha=L2; ctx.strokeStyle= tr? C.data : 'rgba(69,210,236,.5)'; ctx.lineWidth= tr?2.6:1.6; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); }});
+        ['R','S1','S2','V1','V2'].forEach(id => {{
+          const n=N[id], p=P(id);
+          glyph(n.k,p.x,p.y,sz,L2,true);
+          const below = n.k==='switch' ? sz*1.3 : sz*1.5, side = id==='R', tx = side ? p.x + sz*1.4 + 44 : p.x, ty = side ? p.y - 4 : p.y+below;
+          text(n.t,tx,ty,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',L2);
+          if(n.ip) text(n.ip,tx,ty+16,C.data,mono(small?10:11),L2);
+        }});
+        if(L2>=1){{ const ph = reduce ? .3 : (time/3200)%1; const path=[['V1','S1'],['S1','R'],['R','S1'],['S1','S2'],['S2','V2']]; const seg=Math.min(4,Math.floor(ph*5)), k=ph*5-seg; const q=along(path[seg][0],path[seg][1],k); const v = seg<2 ? 0 : 1, col = v ? C.warm : C.ac;
+          dot(q,col,1); const r=P('R'); pill('VID '+D.iv[v][0]+' · TTL '+D.iv[v][1], r.x, (r.y+P('S1').y)/2 + 6, col, 1); }}
+      }}
+    }}
+    function loop(t){{ shown += (stage - shown) * (reduce ? 1 : .06); draw(t); requestAnimationFrame(loop); }}
+    size(); addEventListener('resize', size);
+    if('IntersectionObserver' in window){{
+      const io = new IntersectionObserver(es => es.forEach(e => {{ if(e.isIntersecting){{ stage = +e.target.dataset.stage; chaps.forEach(c => c.classList.toggle('on', c===e.target)); bars.forEach((b,i)=>b.classList.toggle('on', i<=stage)); }} }}), {{rootMargin: matchMedia('(max-width:900px)').matches ? '-62% 0px -28% 0px' : '-45% 0px -45% 0px'}});
+      chaps.forEach(c => io.observe(c));
+      chaps[0].classList.add('on'); bars[0].classList.add('on');
+    }} else {{ chaps.forEach(c=>c.classList.add('on')); bars.forEach(b=>b.classList.add('on')); }}
+    requestAnimationFrame(loop);
+    }})();
+    </script>
+    </body></html>"""
+    out = ROOT if LANG == "en" else os.path.join(ROOT, "ar")
+    os.makedirs(out, exist_ok=True)
+    open(os.path.join(out, "index.html"), "w").write(PAGE.replace('href="guides/', 'href="guides/'))
 print("index.html written")
