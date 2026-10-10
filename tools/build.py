@@ -374,7 +374,7 @@ def head(title, desc, depth, other):
 <a class="skip" href="#main">{t("تخطَّ إلى المحتوى", "Skip to content")}</a>
 <header class="top"><div class="top-in">
 <a class="brand" href="{home}"><span class="logo" aria-hidden="true"></span><span>Fahad Net Lab</span></a>
-<nav class="top-nav" aria-label="{t('الرئيسية', 'Main')}"><a href="{home}#story">{t('الشبكة', 'The network')}</a><a href="{home}#projects">{t('المشاريع', 'Projects')}</a><a href="{WP}" rel="noopener">{t('المدونة', 'Blog')}</a></nav>
+<nav class="top-nav" aria-label="{t('الرئيسية', 'Main')}"><a href="{home}#story">{t('الشبكة', 'The network')}</a><a href="{home}#projects">{t('المشاريع', 'Projects')}</a></nav>
 <a class="lang" href="{other}" hreflang="{t('en', 'ar')}" lang="{t('en', 'ar')}">{t('English', 'العربية')}</a>
 <button class="theme" type="button" aria-label="{t('تبديل المظهر', 'Toggle theme')}"><span aria-hidden="true"></span></button>
 <button class="menu" type="button" aria-label="{t('قائمة المشاريع', 'Project menu')}" aria-expanded="false"><span aria-hidden="true"></span></button>

@@ -158,7 +158,7 @@ for LANG in ("en", "ar"):
     <body>
     <header class="top" id="top"><div class="wrap top-in">
     <a class="brand" href="./"><span class="logo" aria-hidden="true"></span>Fahad Net Lab</a>
-    <nav class="nav" aria-label="{T("الرئيسية", "Main")}"><a class="h" href="#story">{T("الشبكة", "The network")}</a><a class="h" href="#projects">{T("المشاريع", "Projects")}</a><a class="h" href="{WP}" rel="noopener">{T("المدونة", "Blog")}</a><a class="lng" href="{T("../", "ar/")}" lang="{T("en", "ar")}">{T("English", "العربية")}</a></nav>
+    <nav class="nav" aria-label="{T("الرئيسية", "Main")}"><a class="h" href="#story">{T("الشبكة", "The network")}</a><a class="h" href="#projects">{T("المشاريع", "Projects")}</a><a class="lng" href="{T("../", "ar/")}" lang="{T("en", "ar")}">{T("English", "العربية")}</a></nav>
     </div></header>
 
     <main>
