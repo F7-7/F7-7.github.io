@@ -48,7 +48,7 @@
     .shark-h span{margin-left:10px;font-size:12px;color:var(--muted)}
     .shark-c{font-size:11.5px;height:300px;overflow:hidden;position:relative}
     .sr-h,.sr{display:grid;grid-template-columns:34px 52px 200px 44px minmax(0,1fr);gap:8px;padding:5px 12px;white-space:nowrap}
-    .sr-h{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2)}
+    .sr-h{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2);position:relative;z-index:2}
     .sr span{overflow:hidden;text-overflow:ellipsis}
     .sr{color:var(--fg-2);border-bottom:1px solid rgba(30,34,53,.6)}
     .sr.p-FTP span:nth-child(4){color:var(--data)}
@@ -140,7 +140,8 @@
     <section class="story" id="story" aria-label="Building the network step by step"><div class="wrap story-g">
     <div class="chaps"><article class="chap" data-stage="0"><span class="ck mono">01</span><h3>Devices</h3><p>We start with three virtual machines on VMware: a Windows 7 client, a Windows Server, and a second client to receive mail.</p><pre class="term mono" dir="ltr">fahad-PC · Windows Server · saif-PC</pre></article><article class="chap" data-stage="1"><span class="ck mono">02</span><h3>Links</h3><p>All three adapters go on the same VMware LAN Segment. No router yet: every machine shares one broadcast domain.</p><pre class="term mono" dir="ltr">VMware LAN Segment</pre></article><article class="chap" data-stage="2"><span class="ck mono">03</span><h3>IP addresses</h3><p>Each machine gets a static address from the range assigned in the lab, 189.120.0.57 to 189.120.0.64.</p><pre class="term mono" dir="ltr">A 00:0c:29:fb:3d:b1
 B 00:0c:29:38:c4:76</pre></article><article class="chap" data-stage="3"><span class="ck mono">04</span><h3>First test</h3><p>Before any ping, the machine asks for the server&#x27;s MAC with ARP. Then 4 ICMP requests go out and 4 replies come back, all with TTL 128.</p><pre class="term mono" dir="ltr">Who has 189.120.0.58? Tell 189.120.0.57
-189.120.0.58 is at 00:0c:29:38:c4:76</pre></article><article class="chap" data-stage="4"><span class="ck mono">05</span><h3>Services</h3><p>The server runs the services we will analyse, each listening on its own port.</p><pre class="term mono" dir="ltr">FTP 21 · SMTP 587 · POP3 110 · Telnet 23</pre></article><article class="chap" data-stage="5"><span class="ck mono">06</span><h3>Packet analysis</h3><p>We open Wireshark on the server, read the FTP three-way handshake, then take every frame apart byte by byte.</p><pre class="term mono" dir="ltr">SYN      Seq=693140712
+189.120.0.58 is at 00:0c:29:38:c4:76</pre></article><article class="chap" data-stage="4"><span class="ck mono">05</span><h3>Services</h3><p>Windows Server 2025 runs FTP through IIS on port 21, and hMailServer with SMTP on 587 and POP3 on 110. Telnet Server was removed from Windows after 2012 R2, so the Telnet project used a separate Windows Server 2012 R2 VM at the same address.</p><pre class="term mono" dir="ltr">2025      FTP 21 · SMTP 587 · POP3 110
+2012 R2   Telnet 23</pre></article><article class="chap" data-stage="5"><span class="ck mono">06</span><h3>Packet analysis</h3><p>We open Wireshark on the server, read the FTP three-way handshake, then take every frame apart byte by byte.</p><pre class="term mono" dir="ltr">SYN      Seq=693140712
 SYN-ACK  Seq=3010248287 Ack=693140713
 ACK      Seq=693140713 Ack=3010248288</pre></article><article class="chap" data-stage="6"><span class="ck mono">07</span><h3>VLANs and routing</h3><p>In the second lab we split the network with two switches and a router in GNS3. The same ping crosses the trunk twice: tag 10 with TTL 128, then tag 20 with TTL 127.</p><pre class="term mono" dir="ltr">VID 10 · TTL 128  →  R  →  VID 20 · TTL 127</pre></article></div>
     <div class="stage" aria-hidden="true"><canvas id="net"></canvas><div class="prog"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
@@ -180,7 +181,8 @@ ACK      Seq=693140713 Ack=3010248288</pre></article><article class="chap" data-
     function size(){ const d = Math.min(2, devicePixelRatio||1); w = cv.clientWidth; h = cv.clientHeight; cv.width = w*d; cv.height = h*d; ctx.setTransform(d,0,0,d,0,0); }
     const P = id => { const m = Math.min(40, w*.08), top = 36, bot = w < 700 ? 40 : 70; return {x: m + N[id].x*(w-2*m), y: top + N[id].y*(h-top-bot)}; };
     const clamp = (v,a,b) => Math.max(a, Math.min(b, v)), win = (v,a,b) => clamp((v-a)/(b-a),0,1);
-    const only = (v,k) => clamp(1 - Math.abs(v-k)*2.4, 0, 1);   // visible only around stage k
+    const T_TEL = 'Telnet 23 · separate Server 2012 R2 VM';
+const only = (v,k) => clamp(1 - Math.abs(v-k)*2.4, 0, 1);   // visible only around stage k
     function rr(x,y,W,H,r){ ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x,y,W,H,r) : ctx.rect(x,y,W,H); }
     function glyph(k,x,y,s,a,lit){
       ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.lineWidth=1.6; ctx.strokeStyle = lit ? C.ac : '#3B4166'; ctx.fillStyle=C.panel;
@@ -217,9 +219,9 @@ ACK      Seq=693140713 Ack=3010248288</pre></article><article class="chap" data-
           else { const k=(ph-.3)/.7, go=k<.5; dot(go ? along('A','B',k*2) : along('B','A',(k-.5)*2), C.data, te); pill(go ? 'ICMP echo request' : 'echo reply · TTL '+D.ttl, (a.x+b.x)/2, above, C.data, te); }
         }
         const sv = only(s,4)*L1;
-        if(sv>0){ const t=['FTP 21','SMTP 587','POP3 110','Telnet 23'];
-          if(small) t.forEach((x,i)=> pill(x, b.x + (i%2 ? 1 : -1)*46, above - sz*1.2 + Math.floor(i/2)*26 - 26, C.ok, sv));
-          else t.forEach((x,i)=> pill(x, b.x + (i-1.5)*84, above, C.ok, sv)); }
+        if(sv>0){ const t=['FTP 21','SMTP 587','POP3 110'], gap = Math.min(92, w*.25), py = above - (small ? 6 : 0);
+          t.forEach((x,i)=>{ const px = b.x + (i-1)*gap; ctx.save(); ctx.globalAlpha=sv*.6; ctx.strokeStyle=C.ok; ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(b.x, b.y-sz*.9); ctx.lineTo(px, py+11); ctx.stroke(); ctx.restore(); pill(x, px, py, C.ok, sv); });
+          text(T_TEL, b.x, b.y + sz*1.5 + 46, C.warm, mono(small?10:11), sv); }
         const pa = only(s,5)*L1;
         if(pa>0){ const y0 = a.y + sz*1.5 + 46; ['SYN  →','←  SYN-ACK','ACK  →'].forEach((t,i)=>{ const y=y0+i*28, k = reduce ? 1 : clamp(((time/900)%4) - i, 0, 1); ctx.save(); ctx.globalAlpha=pa; ctx.strokeStyle= i===1?C.data:C.ac; ctx.setLineDash([4,4]); ctx.beginPath(); const fx = i===1 ? b.x : a.x, tx = i===1 ? a.x : b.x; ctx.moveTo(fx,y); ctx.lineTo(fx+(tx-fx)*k,y); ctx.stroke(); ctx.restore(); text(t,(a.x+b.x)/2,y-7,C.fg,'600 '+mono(11),pa*(k>0?1:.3)); }); }
         // nodes

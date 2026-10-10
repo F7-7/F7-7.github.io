@@ -18,7 +18,7 @@ for LANG in ("en", "ar"):
      ("02", T("الوصلات", "Links"), T("نضع البطاقات الثلاث على نفس الـ LAN Segment في VMware. لا يوجد راوتر بعد: كل الأجهزة في نفس نطاق البث.", "All three adapters go on the same VMware LAN Segment. No router yet: every machine shares one broadcast domain."), "VMware LAN Segment"),
      ("03", T("عناوين IP", "IP addresses"), T("لكل جهاز عنوان ثابت من النطاق المخصص للطالب في المعمل، من 189.120.0.57 إلى 189.120.0.64.", "Each machine gets a static address from the range assigned in the lab, 189.120.0.57 to 189.120.0.64."), f"A {st['macs']['A']}\nB {st['macs']['B']}"),
      ("04", T("الاختبار الأول", "First test"), T(f"قبل أي ping يسأل الجهاز عن MAC الخادم بـ ARP. بعدها أُرسلت {st['ping']['req']} طلبات ICMP ورجعت {st['ping']['rep']} ردود، كلها بـ TTL {st['ping']['ttl']}.", f"Before any ping, the machine asks for the server's MAC with ARP. Then {st['ping']['req']} ICMP requests go out and {st['ping']['rep']} replies come back, all with TTL {st['ping']['ttl']}."), st["arp"][0] + "\n" + st["arp"][1]),
-     ("05", T("الخدمات", "Services"), T("على الخادم نشغّل الخدمات التي سنحللها، وكل خدمة تنتظر على منفذها.", "The server runs the services we will analyse, each listening on its own port."), "FTP 21 · SMTP 587 · POP3 110 · Telnet 23"),
+     ("05", T("الخدمات", "Services"), T("خادم Windows Server 2025 يشغّل FTP عبر IIS على المنفذ 21، وخادم البريد hMailServer بـ SMTP على 587 و POP3 على 110. أما خدمة Telnet فحُذفت من Windows بعد إصدار 2012 R2، لذلك مشروع Telnet استخدم خادمًا افتراضيًا منفصلًا بنفس العنوان.", "Windows Server 2025 runs FTP through IIS on port 21, and hMailServer with SMTP on 587 and POP3 on 110. Telnet Server was removed from Windows after 2012 R2, so the Telnet project used a separate Windows Server 2012 R2 VM at the same address."), "2025      FTP 21 · SMTP 587 · POP3 110\n2012 R2   Telnet 23"),
      ("06", T("تحليل الحزم", "Packet analysis"), T("نفتح Wireshark على الخادم ونقرأ المصافحة الثلاثية لجلسة FTP، ثم نفكك كل إطار بايتًا بايتًا.", "We open Wireshark on the server, read the FTP three-way handshake, then take every frame apart byte by byte."), f"SYN      Seq={hs1}\nSYN-ACK  Seq={hs2a} Ack={hs2b}\nACK      Seq={hs3a} Ack={hs3b}"),
      ("07", T("VLAN والتوجيه", "VLANs and routing"), T(f"في المعمل الثاني نقسم الشبكة بسويتشين وراوتر في GNS3. نفس طلب ping عبر الـ Trunk مرتين: بوسم {v1} و TTL {t1}، ثم بوسم {v2} و TTL {t2}.", f"In the second lab we split the network with two switches and a router in GNS3. The same ping crosses the trunk twice: tag {v1} with TTL {t1}, then tag {v2} with TTL {t2}."), f"VID {v1} · TTL {t1}  →  R  →  VID {v2} · TTL {t2}"),
     ]
@@ -82,7 +82,7 @@ for LANG in ("en", "ar"):
     .shark-h span{{margin-left:10px;font-size:12px;color:var(--muted)}}
     .shark-c{{font-size:11.5px;height:300px;overflow:hidden;position:relative}}
     .sr-h,.sr{{display:grid;grid-template-columns:34px 52px 200px 44px minmax(0,1fr);gap:8px;padding:5px 12px;white-space:nowrap}}
-    .sr-h{{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2)}}
+    .sr-h{{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2);position:relative;z-index:2}}
     .sr span{{overflow:hidden;text-overflow:ellipsis}}
     .sr{{color:var(--fg-2);border-bottom:1px solid rgba(30,34,53,.6)}}
     .sr.p-FTP span:nth-child(4){{color:var(--data)}}
@@ -210,7 +210,8 @@ for LANG in ("en", "ar"):
     function size(){{ const d = Math.min(2, devicePixelRatio||1); w = cv.clientWidth; h = cv.clientHeight; cv.width = w*d; cv.height = h*d; ctx.setTransform(d,0,0,d,0,0); }}
     const P = id => {{ const m = Math.min(40, w*.08), top = 36, bot = w < 700 ? 40 : 70; return {{x: m + N[id].x*(w-2*m), y: top + N[id].y*(h-top-bot)}}; }};
     const clamp = (v,a,b) => Math.max(a, Math.min(b, v)), win = (v,a,b) => clamp((v-a)/(b-a),0,1);
-    const only = (v,k) => clamp(1 - Math.abs(v-k)*2.4, 0, 1);   // visible only around stage k
+    const T_TEL = 'Telnet 23 · separate Server 2012 R2 VM';
+const only = (v,k) => clamp(1 - Math.abs(v-k)*2.4, 0, 1);   // visible only around stage k
     function rr(x,y,W,H,r){{ ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x,y,W,H,r) : ctx.rect(x,y,W,H); }}
     function glyph(k,x,y,s,a,lit){{
       ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.lineWidth=1.6; ctx.strokeStyle = lit ? C.ac : '#3B4166'; ctx.fillStyle=C.panel;
@@ -247,9 +248,9 @@ for LANG in ("en", "ar"):
           else {{ const k=(ph-.3)/.7, go=k<.5; dot(go ? along('A','B',k*2) : along('B','A',(k-.5)*2), C.data, te); pill(go ? 'ICMP echo request' : 'echo reply · TTL '+D.ttl, (a.x+b.x)/2, above, C.data, te); }}
         }}
         const sv = only(s,4)*L1;
-        if(sv>0){{ const t=['FTP 21','SMTP 587','POP3 110','Telnet 23'];
-          if(small) t.forEach((x,i)=> pill(x, b.x + (i%2 ? 1 : -1)*46, above - sz*1.2 + Math.floor(i/2)*26 - 26, C.ok, sv));
-          else t.forEach((x,i)=> pill(x, b.x + (i-1.5)*84, above, C.ok, sv)); }}
+        if(sv>0){{ const t=['FTP 21','SMTP 587','POP3 110'], gap = Math.min(92, w*.25), py = above - (small ? 6 : 0);
+          t.forEach((x,i)=>{{ const px = b.x + (i-1)*gap; ctx.save(); ctx.globalAlpha=sv*.6; ctx.strokeStyle=C.ok; ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(b.x, b.y-sz*.9); ctx.lineTo(px, py+11); ctx.stroke(); ctx.restore(); pill(x, px, py, C.ok, sv); }});
+          text(T_TEL, b.x, b.y + sz*1.5 + 46, C.warm, mono(small?10:11), sv); }}
         const pa = only(s,5)*L1;
         if(pa>0){{ const y0 = a.y + sz*1.5 + 46; ['SYN  →','←  SYN-ACK','ACK  →'].forEach((t,i)=>{{ const y=y0+i*28, k = reduce ? 1 : clamp(((time/900)%4) - i, 0, 1); ctx.save(); ctx.globalAlpha=pa; ctx.strokeStyle= i===1?C.data:C.ac; ctx.setLineDash([4,4]); ctx.beginPath(); const fx = i===1 ? b.x : a.x, tx = i===1 ? a.x : b.x; ctx.moveTo(fx,y); ctx.lineTo(fx+(tx-fx)*k,y); ctx.stroke(); ctx.restore(); text(t,(a.x+b.x)/2,y-7,C.fg,'600 '+mono(11),pa*(k>0?1:.3)); }}); }}
         // nodes
