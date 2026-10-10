@@ -273,6 +273,7 @@ details.err p{font-size:15px;color:var(--fg-2);margin-bottom:6px}
 .fr .sb{position:absolute;left:var(--lo);right:calc(100% - var(--hi));top:36px;text-align:center;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-inline:14px}
 .fr.ctl{--ac:var(--muted)}.fr.ctl .ln{background:var(--muted);opacity:.7}.fr.ctl .lb{color:var(--muted)}
 .fr.arp{--ac:var(--warn)}.fr.arp .ln{background:var(--warn)}
+.fr.sec{--ac:var(--bad)}.fr.sec .ln{background:var(--bad)}.fr.sec .lb{color:var(--bad)}
 .fr.v20{--ac:var(--warn)}.fr.v20 .ln{background:var(--warn)}
 .fr.rx{--ac:var(--warn)}.fr.rx .ln{background:repeating-linear-gradient(90deg,var(--warn) 0 8px,transparent 8px 12px)}.fr.rx .lb{color:var(--warn)}
 .fr.lost .ln{background:repeating-linear-gradient(90deg,var(--bad) 0 6px,transparent 6px 10px);right:calc(100% - (var(--lo) + (var(--hi) - var(--lo)) * .55))}

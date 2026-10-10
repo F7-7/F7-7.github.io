@@ -5,7 +5,7 @@ import base64, html, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 from decode import load, tcp_checks
-from content import GUIDES, L, ETH_TABLE, PIGGY, TELNET_REPORT
+from content import GUIDES, L, ETH_TABLE, PIGGY
 
 CAP = os.path.join(ROOT, "captures")
 E = html.escape
@@ -109,7 +109,64 @@ def findings_vlan():
     R.append(("الرد بنفس الطريق", f"VID {rp[0]['vlan']} · TTL {rp[0]['ttl']} ثم VID {rp[1]['vlan']} · TTL {rp[1]['ttl']}.", [rp[0]['no'], rp[1]['no']], "intervlan"))
     return R
 
-FINDINGS = {"ftp": findings_ftp, "ftp-bulk": findings_bulk, "smtp-pop3": findings_smtp, "arp-icmp": findings_arp, "vlan-intervlan": findings_vlan}
+
+# ------------------------------------------------------------------ Telnet helpers
+TN_CLIENT, TN_SERVER = "189.120.0.57", "189.120.0.58"
+def tn_bytes(f):
+    s = f["s"]; L = s.get("plen") or 0
+    h = f["hex"]; ip_end = 14 + 20 + 20  # placeholder, real offset computed below
+    raw = bytes.fromhex(h)
+    # payload = last plen bytes before Ethernet padding: locate from TCP header
+    ihl = (raw[14] & 15) * 4; tot = int.from_bytes(raw[16:18], "big"); thl = (raw[14 + ihl + 12] >> 4) * 4
+    start = 14 + ihl + thl
+    return raw[start:14 + tot]
+
+def tn_phases():
+    """Split the Telnet capture into phases by content. Returns dict of frame lists."""
+    fr = frames("telnet"); P = {"user": [], "pw": [], "pw_ack": [], "exit": []}; state = "pre"
+    for f in fr:
+        s = f["s"]
+        if s.get("proto") != "TCP": continue
+        b = tn_bytes(f); cli = s["src"] == TN_CLIENT
+        if not cli and b"login:" in b: state = "user"; P["login"] = s["no"]; continue
+        if not cli and b"password:" in b: state = "pw"; P["pwprompt"] = s["no"]; continue
+        if not cli and b"\x1b[" in b and len(b) > 200: P["screen"] = s["no"]; state = "shell"; continue
+        if state == "user" and len(b) == 1: P["user"].append(s["no"])
+        if state == "user" and cli and b == b"\r\n": P["user_end"] = s["no"]
+        if state == "pw" and cli and len(b) == 1: P["pw"].append(s["no"])
+        if state == "pw" and not cli and not b: P["pw_ack"].append(s["no"])
+        if state == "pw" and not cli and len(b) == 1: P["pw_echo"] = True
+        if state == "pw" and cli and b == b"\r\n": P["pw_end"] = s["no"]; state = "post"
+        if state == "shell" and len(b) == 1: P["exit"].append(s["no"])
+        if state == "shell" and cli and b == b"\r\n": P["exit_end"] = s["no"]
+        if "FIN" in s["flags"] and "fin" not in P: P["fin"] = s["no"]; P["fin_by"] = "server" if not cli else "client"
+        if b.startswith(b"\xff\xfa\x18\x00"): P["ttype"] = s["no"]; P["ttype_val"] = b[4:-2].decode("ascii", "replace")
+        if b.startswith(b"\xff\xfa\x25") and b"NTLMSSP\x00" in b:
+            P.setdefault("ntlm", []).append((s["no"], len(b), b[b.index(b"NTLMSSP\x00") + 8]))
+        if b"\xff\xfa\x1f" in b:
+            i = b.index(b"\xff\xfa\x1f"); P["naws"] = (s["no"], int.from_bytes(b[i+3:i+5], "big"), int.from_bytes(b[i+5:i+7], "big"), b[i:i+9].hex(" "))
+        if b.startswith(b"\xff\xfa\x27\x00") and b"SFUTLNTMODE" in b:
+            P["env"] = s["no"]; P["env_mode"] = b.split(b"SFUTLNTMODE\x01")[1].split(b"\xff")[0].decode()
+    first = next(f for f in fr if f["s"].get("plen") and f["s"]["src"] == TN_SERVER)
+    b = tn_bytes(first); P["first"] = (first["s"]["no"], len(b), sum(1 for i in range(0, len(b), 3) if b[i] == 0xff))
+    P["user_txt"] = "".join(chr(tn_bytes(next(f for f in fr if f["s"]["no"] == n))[0]) for n in P["user"] if frames("telnet")[n-1]["s"]["src"] == TN_CLIENT)
+    return P
+
+def findings_telnet():
+    P = tn_phases(); R = []
+    n, ln, k = P["first"]
+    R.append((f"{k} طلبات في رسالة واحدة", f"أول ما أرسله الخادم {ln} بايت: {k} أوامر IAC، كل أمر 3 بايتات، قبل أي نص على الشاشة.", [n]))
+    no, c, r, hx = P["naws"]
+    R.append((f"نافذة {c} × {r}", f"العميل أعلن حجم شاشته: <code dir=\"ltr\">{hx}</code>.", [no]))
+    nt = P["ntlm"]; names = {1: "Negotiate", 2: "Challenge", 3: "Authenticate"}
+    R.append(("NTLM ثم الرفض", "ثلاث رسائل NTLMSSP: " + "، ثم ".join(f"{names.get(t, t)} بحجم {l} بايت" for _, l, t in nt) + ". محتوى الرسالتين الأخيرتين مُصفّر في الملف المنشور.<br>بعدها رد الخادم: <span dir=\"ltr\">Telnet server could not log you in using NTLM authentication.</span>", [x[0] for x in nt] + [P["login"]]))
+    nu = len(P["user_txt"])
+    R.append(("اسم المستخدم يعود، كلمة المرور لا", f"اسم المستخدم {nu} حروف، كل حرف في مقطع والخادم يعيده. كلمة المرور {len(P['pw'])} ضغطة، والخادم يرد على كل واحدة بـ ACK فقط. لكن الحروف نفسها تمر بنص واضح، لذلك استُبدلت بـ * في الملف المنشور.", [P["user"][0], P["user"][1], P["pw"][0], P["pw_ack"][0]]))
+    R.append((f"الطرفية {P['ttype_val']} والشاشة", f"بعد الدخول طلب الخادم نوع الطرفية فأجاب العميل {P['ttype_val']}، ثم أرسل الخادم الشاشة كاملة في {frames('telnet')[P['screen']-1]['s']['plen']} بايت بأوامر ANSI لتحديد مكان كل سطر.", [P["ttype"], P["screen"]]))
+    R.append(("الخادم يغلق أولًا", f"بعد <code>exit</code> أرسل {'الخادم' if P['fin_by'] == 'server' else 'العميل'} FIN، ثم أغلق الطرف الآخر.", [P["fin"]]))
+    return R
+
+FINDINGS = {"telnet": findings_telnet, "ftp": findings_ftp, "ftp-bulk": findings_bulk, "smtp-pop3": findings_smtp, "arp-icmp": findings_arp, "vlan-intervlan": findings_vlan}
 
 # ------------------------------------------------------------------ sequence diagrams
 def flow_html(cols, rows, cap=None, note=""):
@@ -174,14 +231,58 @@ def flow_block(g):
         rows = [{"a": idx[s["src_mac"]], "b": idx[s["dst_mac"]], "label": ("Echo request" if s["icmp_type"] == 8 else "Echo reply") + f" · VID {s['vlan']}", "sub": f"TTL {s['ttl']} · {s['src']} → {s['dst']}", "no": s["no"], "cls": "v10" if s["vlan"] == 10 else "v20"} for s in sorted(rq + rp, key=lambda s: s["no"])]
         return flow_html(["A · VLAN 10", "R · Router on a Stick", "B · VLAN 20"], rows, "intervlan", "نفس الطلب يمر على الـ Trunk مرتين. اضغط أي سهم لفتح الإطار.")
     if g["slug"] == "telnet":
-        rows = []
-        for no, d, c, ln in TELNET_REPORT:
-            if d == "الاتجاهين":
-                rows.append({"a": 0, "b": 1, "label": c, "sub": f"الرسائل {no}", "cls": "ctl"})
+        fr = frames("telnet"); P = tn_phases(); H = [TN_CLIENT, TN_SERVER]; rows = []
+        names = {1: "NTLMSSP Negotiate", 2: "NTLMSSP Challenge", 3: "NTLMSSP Authenticate"}
+        ntlm = {n: names.get(t) for n, _, t in P["ntlm"]}
+        def add(n, label, cls=""):
+            s = fr[n - 1]["s"]
+            rows.append({"a": H.index(s["src"]), "b": H.index(s["dst"]), "label": label, "sub": f"Seq {s['seq']} · Ack {s['ack']} · Len {s['plen']}", "no": n, "cls": cls})
+        def group(a, b, label, sub, n, cls="ctl"):
+            rows.append({"a": a, "b": b, "label": label, "sub": sub, "no": n, "cls": cls})
+        IAC = {0xfb: "WILL", 0xfc: "WONT", 0xfd: "DO", 0xfe: "DONT"}
+        OPT = {0: "Binary", 1: "Echo", 3: "SGA", 0x18: "Terminal-Type", 0x1f: "NAWS", 0x25: "Auth", 0x27: "New-Environ"}
+        def iac_label(b):
+            out = []; i = 0
+            while i < len(b) - 1:
+                if b[i] == 0xff and b[i+1] in IAC: out.append(f"{IAC[b[i+1]]} {OPT.get(b[i+2], hex(b[i+2]))}"); i += 3
+                elif b[i] == 0xff and b[i+1] == 0xfa:
+                    j = b.find(b"\xff\xf0", i); opt = OPT.get(b[i+2], hex(b[i+2]))
+                    if b[i+2] == 0x1f: extra = f" {int.from_bytes(b[i+3:i+5],'big')}×{int.from_bytes(b[i+5:i+7],'big')}"
+                    else:
+                        sub = {0: "IS", 1: "SEND", 2: "REPLY"}.get(b[i+3], "")
+                        extra = f" {sub}" + (f" {b[i+4:j].decode('ascii','replace')}" if b[i+2] == 0x18 and b[i+3] == 0 else "")
+                    lab = f"SB {opt}{extra}"
+                    if not out or out[-1] != lab: out.append(lab)
+                    i = j + 2 if j > 0 else len(b)
+                else: break
+            return " · ".join(out)
+        skip = set(P["user"][2:] + P["pw"][1:] + P["pw_ack"][1:] + P["exit"][2:])
+        for f in fr:
+            s = f["s"]; n = s["no"]
+            if s.get("proto") != "TCP" or n in skip: continue
+            b = tn_bytes(f); fl = s["flags"]
+            if n in ntlm: add(n, f"{ntlm[n]} · {len(b)} بايت"); continue
+            if not b:
+                if any(k in fl for k in ("SYN", "FIN")) or n == 3: add(n, fl.replace(" ", "-"), "ctl")
+                elif n == P["pw_ack"][0]:
+                    add(n, "ACK فقط · لا Echo", "ctl")
+                    group(0, 1, f"… {len(P['pw'])} ضغطة، كل واحدة بلا Echo", f"الإطارات {P['pw'][0]}–{P['pw_ack'][-1]}", P["pw"][-1])
                 continue
-            a = 1 if d.startswith("الخادم") else 0
-            rows.append({"a": a, "b": 1 - a, "label": c, "sub": f"الرسالة {no} · {ln} بايت" if ln not in ("—",) else f"الرسالة {no}"})
-        return flow_html(["العميل 189.120.0.57", "الخادم 189.120.0.58"], rows)
+            if n == P["login"]: add(n, "رفض NTLM · login:"); continue
+            if n == P["pwprompt"]: add(n, "password:"); continue
+            if n == P["screen"]: add(n, f"شاشة الدخول · {len(b)} بايت"); continue
+            if n == P.get("env"): add(n, f"SB New-Environ IS · MODE={P['env_mode']}"); continue
+            if b[0] == 0xff: add(n, iac_label(b)); continue
+            if n == P["pw"][0]:
+                add(n, "حرف من كلمة المرور · مخفي", "sec"); continue
+            if b == b"\r\n": add(n, "Enter · \\r\\n"); continue
+            if n in P["user"][:2] or n in P["exit"][:2]:
+                add(n, f"'{b.decode('latin-1')}'" + (" · Echo" if s["src"] == TN_SERVER else ""))
+                if n == P["user"][1]: group(0, 1, f"… بقية اسم المستخدم حرفًا حرفًا مع Echo", f"الإطارات {P['user'][2]}–{P['user'][-1]}", P["user"][2])
+                if n == P["exit"][1]: group(0, 1, "… x · i · t بنفس الطريقة", f"الإطارات {P['exit'][2]}–{P['exit'][-1]}", P["exit"][2])
+                continue
+            add(n, first_line(b.decode("latin-1")))
+        return flow_html(["العميل 189.120.0.57", "الخادم 189.120.0.58"], rows, "telnet", "اضغط أي سهم لفتح الإطار في مستكشف الحزم.")
     if g["slug"] == "tcp-piggybacking":
         p = PIGGY; rows = []; sa, sb = p["isn_a"] + 1, p["isn_b"] + 1
         for i in range(3):

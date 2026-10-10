@@ -87,7 +87,7 @@ p{margin:0}
   .story-g{display:flex;flex-direction:column}
   .stage{order:-1;top:62px;height:46vh;height:46svh;z-index:2;background:linear-gradient(var(--ink) 88%,transparent)}
   .chaps{padding-top:0}
-  .chap{min-height:62vh}
+  .chap{min-height:70vh}
   .prog{display:none}
 }
 
@@ -147,7 +147,7 @@ ACK      Seq=693140713 Ack=3010248288</pre></article><article class="chap" data-
 
 <section class="sec" id="projects"><div class="wrap">
 <div class="sec-h"><span class="eyb">PROJECTS</span><h2>المشاريع</h2><p>اختر مشروعًا وامشِ معه خطوة بخطوة.</p></div>
-<div class="cards"><a class="card" href="guides/ftp/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">01</span></div><h3>التقاط جلسة FTP وتحليلها</h3><p>نبني عميلًا وخادم FTP على أجهزة افتراضية، ونلتقط الجلسة كاملة، ونقرأ قناة التحكم وقناتي البيانات حزمةً حزمة.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/ftp-bulk/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">02</span></div><h3>نقل ملف 10KB عبر FTP</h3><p>نحمّل ملفًا حجمه 10240 بايت بأمر RETR، ونتابع اتصال البيانات من فتحه حتى إغلاقه، ونكتشف لماذا ظهر الملف كله في إطار واحد.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/smtp-pop3/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">03</span></div><h3>خادم بريد: إرسال بـ SMTP واستلام بـ POP3</h3><p>نبني خادم بريد بـ hMailServer، ونرسل رسالة من جهاز ونستلمها من جهاز آخر، ونقرأ الحوارين كاملين.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/telnet/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">04</span></div><h3>تفكيك جلسة Telnet</h3><p>نتصل بخادم Telnet ونقرأ تفاوض الخيارات، ومحاولة مصادقة NTLM، وتسجيل الدخول حرفًا حرفًا.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/tcp-piggybacking/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">05</span></div><h3>سيناريو TCP Piggybacking</h3><p>سيناريو نظري لثلاث رسائل في كل اتجاه، نحسب فيه Seq و Ack لكل مقطع، ونرى كيف يركب التأكيد مع البيانات.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/tcp-retransmission/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">06</span></div><h3>ضياع مقطعين وإعادة إرسالهما</h3><p>نفس سيناريو Piggybacking، لكن يضيع المقطعان S4 و S6. نرى كيف يكتشف المرسل الضياع بانتهاء RTO، ويعيد الإرسال بنفس الهيدر.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/arp-icmp/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">07</span></div><h3>ماذا يحدث عند تنفيذ ping؟ ARP و ICMP</h3><p>نلتقط أمر ping بين جهازين، ونفكك طلب ARP ورده، ثم رسائل ICMP Echo، بايتًا بايتًا.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/vlan-intervlan/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">08</span></div><h3>VLAN و InterVLAN على GNS3</h3><p>نقسم الشبكة إلى VLAN 10 و VLAN 20، ونرى وسم 802.1Q على الـ Trunk، ثم نوصل الشبكتين بـ Router on a Stick ونراقب TTL والوسم يتغيران.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/ethernet-history/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">09</span></div><h3>تطور تقنيات Ethernet</h3><p>كيف تطورت Ethernet من كيبل محوري بسرعة 10 Mbps في 1983 إلى 800 Gigabit اليوم.</p><span class="more">ابدأ المشروع</span></a></div>
+<div class="cards"><a class="card" href="guides/ftp/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">01</span></div><h3>التقاط جلسة FTP وتحليلها</h3><p>نبني عميلًا وخادم FTP على أجهزة افتراضية، ونلتقط الجلسة كاملة، ونقرأ قناة التحكم وقناتي البيانات حزمةً حزمة.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/ftp-bulk/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">02</span></div><h3>نقل ملف 10KB عبر FTP</h3><p>نحمّل ملفًا حجمه 10240 بايت بأمر RETR، ونتابع اتصال البيانات من فتحه حتى إغلاقه، ونكتشف لماذا ظهر الملف كله في إطار واحد.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/smtp-pop3/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">03</span></div><h3>خادم بريد: إرسال بـ SMTP واستلام بـ POP3</h3><p>نبني خادم بريد بـ hMailServer، ونرسل رسالة من جهاز ونستلمها من جهاز آخر، ونقرأ الحوارين كاملين.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/telnet/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">04</span></div><h3>تفكيك جلسة Telnet</h3><p>نتصل بخادم Telnet ونقرأ تفاوض الخيارات، ومحاولة مصادقة NTLM، وتسجيل الدخول حرفًا حرفًا.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/tcp-piggybacking/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">05</span></div><h3>سيناريو TCP Piggybacking</h3><p>سيناريو نظري لثلاث رسائل في كل اتجاه، نحسب فيه Seq و Ack لكل مقطع، ونرى كيف يركب التأكيد مع البيانات.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/tcp-retransmission/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">06</span></div><h3>ضياع مقطعين وإعادة إرسالهما</h3><p>نفس سيناريو Piggybacking، لكن يضيع المقطعان S4 و S6. نرى كيف يكتشف المرسل الضياع بانتهاء RTO، ويعيد الإرسال بنفس الهيدر.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/arp-icmp/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">07</span></div><h3>ماذا يحدث عند تنفيذ ping؟ ARP و ICMP</h3><p>نلتقط أمر ping بين جهازين، ونفكك طلب ARP ورده، ثم رسائل ICMP Echo، بايتًا بايتًا.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/vlan-intervlan/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">08</span></div><h3>VLAN و InterVLAN على GNS3</h3><p>نقسم الشبكة إلى VLAN 10 (staff) و VLAN 20 (student)، ونرى وسم 802.1Q على الـ Trunk، ثم نوصل الشبكتين بـ Router on a Stick ونراقب TTL والوسم يتغيران.</p><span class="more">ابدأ المشروع</span></a><a class="card" href="guides/ethernet-history/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">09</span></div><h3>تطور تقنيات Ethernet</h3><p>كيف تطورت Ethernet من كيبل محوري بسرعة 10 Mbps في 1983 إلى 800 Gigabit اليوم.</p><span class="more">ابدأ المشروع</span></a></div>
 </div></section>
 
 </main>
@@ -162,24 +162,24 @@ addEventListener('scroll', () => top.classList.toggle('solid', scrollY > 30), {p
 
 const cv = document.getElementById('net'), ctx = cv.getContext('2d');
 const chaps = [...document.querySelectorAll('.chap')], bars = [...document.querySelectorAll('.prog i')];
-let stage = reduce ? 6 : 0, shown = reduce ? 6 : 0, w = 0, h = 0;
+let stage = 0, shown = 0, w = 0, h = 0;
 const C = {fg:'#EDEEF7', mut:'#7F85A6', line:'#2A2F48', ac:'#8C8CFF', data:'#45D2EC', warm:'#F2B65A', ok:'#4FD39A', panel:'#141726'};
-// lab 1 (VMware) on the left/top, lab 2 (GNS3) appears at stage 6
+// scene 1: the VMware lab (stages 0-5). scene 2: the GNS3 lab (stage 6). Never both at once.
 const N = {
-  A: {x:.18, y:.30, k:'pc',     t:'fahad-PC', s:'Windows 7',    ip:'189.120.0.57', mac:D.macs.A},
-  B: {x:.50, y:.30, k:'server', t:'Server',   s:'Windows Server', ip:'189.120.0.58', mac:D.macs.B},
-  C: {x:.82, y:.30, k:'pc',     t:'saif-PC',  s:'Windows 7',    ip:'189.120.0.59', mac:''},
-  R: {x:.50, y:.58, k:'router', t:'R c3725',  s:'Router on a Stick', ip:'.0.1 / .1.1', g:2},
-  S1:{x:.28, y:.74, k:'switch', t:'S1', s:'', ip:'', g:2},
-  S2:{x:.72, y:.74, k:'switch', t:'S2', s:'', ip:'', g:2},
-  V1:{x:.12, y:.92, k:'pc', t:'VLAN 10', s:'', ip:'189.120.0.61', g:2},
-  V2:{x:.88, y:.92, k:'pc', t:'VLAN 20', s:'', ip:'189.120.1.61', g:2}
+  A: {x:.18, y:.42, k:'pc',     t:'fahad-PC', ip:'189.120.0.57', mac:D.macs.A},
+  B: {x:.50, y:.42, k:'server', t:'Server',   ip:'189.120.0.58', mac:D.macs.B},
+  C: {x:.82, y:.42, k:'pc',     t:'saif-PC',  ip:'189.120.0.59', mac:''},
+  R: {x:.50, y:.10, k:'router', t:'R1',   ip:'.0.1 · .1.1', g:2},
+  S1:{x:.27, y:.47, k:'switch', t:'ESW1', ip:'', g:2},
+  S2:{x:.73, y:.47, k:'switch', t:'ESW2', ip:'', g:2},
+  V1:{x:.14, y:.84, k:'pc', t:'PC A · VLAN 10', ip:'189.120.0.61', g:2},
+  V2:{x:.86, y:.84, k:'pc', t:'PC B · VLAN 20', ip:'189.120.1.61', g:2}
 };
 const LINKS1 = [['A','B'],['B','C']], LINKS2 = [['R','S1',1],['S1','S2',1],['S1','V1'],['S2','V2']];
 function size(){ const d = Math.min(2, devicePixelRatio||1); w = cv.clientWidth; h = cv.clientHeight; cv.width = w*d; cv.height = h*d; ctx.setTransform(d,0,0,d,0,0); }
-let l2g = 0;
-const P = id => { const m = 30, top = 40; let y = N[id].y; if (!N[id].g) y = .46 + (y - .46) * 1 - .16 * l2g + (1 - l2g) * .0; if (!N[id].g) y = (1 - l2g) * .42 + l2g * N[id].y; return {x: m + N[id].x*(w-2*m), y: top + y*(h-top-70)}; };
+const P = id => { const m = Math.min(40, w*.08), top = 36, bot = w < 700 ? 40 : 70; return {x: m + N[id].x*(w-2*m), y: top + N[id].y*(h-top-bot)}; };
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v)), win = (v,a,b) => clamp((v-a)/(b-a),0,1);
+const only = (v,k) => clamp(1 - Math.abs(v-k)*2.4, 0, 1);   // visible only around stage k
 function rr(x,y,W,H,r){ ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x,y,W,H,r) : ctx.rect(x,y,W,H); }
 function glyph(k,x,y,s,a,lit){
   ctx.save(); ctx.globalAlpha=a; ctx.translate(x,y); ctx.lineWidth=1.6; ctx.strokeStyle = lit ? C.ac : '#3B4166'; ctx.fillStyle=C.panel;
@@ -189,57 +189,68 @@ function glyph(k,x,y,s,a,lit){
   else { ctx.beginPath(); ctx.ellipse(0,s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); ctx.fillRect(-s*.9,-s*.2,s*1.8,s*.4); ctx.beginPath(); ctx.ellipse(0,-s*.2,s*.9,s*.3,0,0,7); ctx.fill(); ctx.stroke(); }
   ctx.restore();
 }
-function text(t,x,y,col,font,a){ ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.font=font; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.restore(); }
-function pill(t,x,y,col,a){ ctx.save(); ctx.globalAlpha=a; ctx.font='600 11px "JetBrains Mono",monospace'; const tw=ctx.measureText(t).width+14; ctx.fillStyle='rgba(8,9,15,.9)'; ctx.strokeStyle=col; rr(x-tw/2,y-11,tw,20,10); ctx.fill(); ctx.stroke(); ctx.fillStyle=col; ctx.textAlign='center'; ctx.fillText(t,x,y+3.5); ctx.restore(); }
+function text(t,x,y,col,font,a){ if(a<=0) return; ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.font=font; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.restore(); }
+function pill(t,x,y,col,a){ if(a<=0) return; ctx.save(); ctx.globalAlpha=a; ctx.font='600 11px "JetBrains Mono",monospace'; const tw=ctx.measureText(t).width+16; x = clamp(x, tw/2+4, w-tw/2-4); ctx.fillStyle='rgba(8,9,15,.92)'; ctx.strokeStyle=col; rr(x-tw/2,y-11,tw,22,11); ctx.fill(); ctx.stroke(); ctx.fillStyle=col; ctx.textAlign='center'; ctx.fillText(t,x,y+4); ctx.restore(); }
 function along(a,b,k){ const p=P(a), q=P(b); return {x:p.x+(q.x-p.x)*k, y:p.y+(q.y-p.y)*k}; }
+function dot(q,col,a){ ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,7); ctx.fill(); ctx.restore(); }
 
 function draw(time){
-  const s = shown, sz = clamp(Math.min(w,h)*.05, 14, 28);
-  l2g = win(s,5.2,6);
+  const s = shown, sz = clamp(Math.min(w,h)*.05, 14, 26), small = w < 520;
+  const L1 = 1 - win(s,5.3,5.8), L2 = win(s,5.6,6);
   ctx.clearRect(0,0,w,h);
-  // dotted ground
-  ctx.fillStyle='rgba(127,133,166,.14)';
-  for(let x=20;x<w;x+=24) for(let y=30;y<h-50;y+=24) ctx.fillRect(x,y,1.2,1.2);
-  // lab 1 links
-  const lk = win(s,.6,1.4);
-  LINKS1.forEach(([a,b]) => { const p=P(a), q=along(a,b,lk); if(lk<=0) return; ctx.save(); ctx.strokeStyle=C.ac; ctx.globalAlpha=.8; ctx.lineWidth=2; ctx.shadowColor=C.ac; ctx.shadowBlur=8; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); });
-  if(lk>=1) text('VMware LAN Segment', (P('A').x+P('C').x)/2, P('A').y - sz*2.2, C.mut, '11px "JetBrains Mono",monospace', win(s,1.2,1.6));
-  // test: ARP then ICMP between A and B
-  const te = win(s,2.6,3.2) * (1 - win(s,3.8,4.2));
-  if(te>0){
-    const ph = reduce ? .5 : (time/2200)%1;
-    if(ph<.35){ const a=P('A'); ctx.save(); ctx.globalAlpha=te*(1-ph/.35); ctx.strokeStyle=C.warm; ctx.beginPath(); ctx.arc(a.x,a.y,sz+ph*sz*8,0,7); ctx.stroke(); ctx.restore(); pill('ARP who-has .58', a.x, a.y+sz*2.9, C.warm, te); }
-    else { const k=(ph-.35)/.65, go = k<.5, q = go ? along('A','B',k*2) : along('B','A',(k-.5)*2); ctx.save(); ctx.globalAlpha=te; ctx.fillStyle=C.data; ctx.shadowColor=C.data; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,7); ctx.fill(); ctx.restore(); pill(go?'ICMP echo':'reply · TTL '+D.ttl, q.x, q.y-16, C.data, te); }
+  ctx.fillStyle='rgba(127,133,166,.12)';
+  for(let x=20;x<w;x+=24) for(let y=24;y<h-30;y+=24) ctx.fillRect(x,y,1.2,1.2);
+  const mono = px => px+'px "JetBrains Mono",monospace';
+
+  if(L1>0){
+    const a = P('A'), b = P('B'), above = a.y - sz*2.4;
+    // links grow at stage 1
+    const lk = win(s,.6,1.3);
+    LINKS1.forEach(([x,y]) => { if(lk<=0) return; const p=P(x), q=along(x,y,lk); ctx.save(); ctx.globalAlpha=.8*L1; ctx.strokeStyle=C.ac; ctx.lineWidth=2; ctx.shadowColor=C.ac; ctx.shadowBlur=8; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); });
+    // one overlay at a time, each in the band above the line
+    text('VMware LAN Segment', b.x, above, C.mut, mono(11), only(s,1)*L1);
+    const te = only(s,3)*L1;
+    if(te>0){
+      const ph = reduce ? .6 : (time/2400)%1;
+      if(ph<.3){ ctx.save(); ctx.globalAlpha=te*(1-ph/.3); ctx.strokeStyle=C.warm; ctx.beginPath(); ctx.arc(a.x,a.y,sz+ph*sz*6,0,7); ctx.stroke(); ctx.restore(); pill('ARP · who has .58?', (a.x+b.x)/2, above, C.warm, te); }
+      else { const k=(ph-.3)/.7, go=k<.5; dot(go ? along('A','B',k*2) : along('B','A',(k-.5)*2), C.data, te); pill(go ? 'ICMP echo request' : 'echo reply · TTL '+D.ttl, (a.x+b.x)/2, above, C.data, te); }
+    }
+    const sv = only(s,4)*L1;
+    if(sv>0){ const t=['FTP 21','SMTP 587','POP3 110','Telnet 23'];
+      if(small) t.forEach((x,i)=> pill(x, b.x + (i%2 ? 1 : -1)*46, above - sz*1.2 + Math.floor(i/2)*26 - 26, C.ok, sv));
+      else t.forEach((x,i)=> pill(x, b.x + (i-1.5)*84, above, C.ok, sv)); }
+    const pa = only(s,5)*L1;
+    if(pa>0){ const y0 = a.y + sz*1.5 + 46; ['SYN  →','←  SYN-ACK','ACK  →'].forEach((t,i)=>{ const y=y0+i*28, k = reduce ? 1 : clamp(((time/900)%4) - i, 0, 1); ctx.save(); ctx.globalAlpha=pa; ctx.strokeStyle= i===1?C.data:C.ac; ctx.setLineDash([4,4]); ctx.beginPath(); const fx = i===1 ? b.x : a.x, tx = i===1 ? a.x : b.x; ctx.moveTo(fx,y); ctx.lineTo(fx+(tx-fx)*k,y); ctx.stroke(); ctx.restore(); text(t,(a.x+b.x)/2,y-7,C.fg,'600 '+mono(11),pa*(k>0?1:.3)); }); }
+    // nodes
+    ['A','B','C'].forEach(id => {
+      const n=N[id], p=P(id), na = (id==='A'? win(s,-.2,.3) : id==='B'? win(s,0,.5) : win(s,.2,.7)) * L1;
+      if(na<=0) return;
+      glyph(n.k,p.x,p.y-(1-na)*18,sz,na, s>=1.5);
+      text(n.t,p.x,p.y+sz*1.5,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',na);
+      text(n.ip,p.x,p.y+sz*1.5+16,C.data,mono(small?10:11),na*win(s,1.6,2.2));
+      if(n.mac && !small) text(n.mac,p.x,p.y+sz*1.5+31,C.mut,mono(10),na*only(s,2));
+    });
   }
-  // services on server
-  const sv = win(s,3.6,4.2);
-  if(sv>0){ const b=P('B'); ['FTP 21','SMTP 587','POP3 110','Telnet 23'].forEach((t,i)=> pill(t, b.x + (i-1.5)*Math.min(78,w/6), b.y + sz*4.6, C.ok, sv*(1-win(s,5.6,6)))); }
-  // packet analysis: handshake ladder between A and B
-  const pa = win(s,4.6,5.2)*(1-win(s,5.8,6.2));
-  if(pa>0){ const a=P('A'), b=P('B'); const y0=a.y+sz*2.6; ['SYN →','← SYN-ACK','ACK →'].forEach((t,i)=>{ const y=y0+i*26; ctx.save(); ctx.globalAlpha=pa; ctx.strokeStyle= i===1?C.data:C.ac; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(a.x,y); ctx.lineTo(b.x,y); ctx.stroke(); ctx.restore(); text(t,(a.x+b.x)/2,y-6,C.fg2||C.fg,'600 11px "JetBrains Mono",monospace',pa); }); }
-  // lab 2
-  const l2 = win(s,5.4,6);
-  if(l2>0){
-    const zone = (a,b,col) => { const p=P(a), q=P(b), cx=(p.x+q.x)/2, cy=(p.y+q.y)/2, r=Math.hypot(p.x-q.x,p.y-q.y)/2+sz*2; const g=ctx.createRadialGradient(cx,cy,r*.2,cx,cy,r); g.addColorStop(0,col.replace('1)', (.16*l2)+')')); g.addColorStop(1,col.replace('1)','0)')); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.fill(); };
-    zone('S1','V1','rgba(140,140,255,1)'); zone('S2','V2','rgba(242,182,90,1)');
-    LINKS2.forEach(([a,b,tr]) => { const p=P(a), q=along(a,b,l2); ctx.save(); ctx.strokeStyle= tr? C.data : 'rgba(69,210,236,.5)'; ctx.lineWidth= tr?2.6:1.6; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); if(tr && l2>=1) text('802.1Q',(P(a).x+P(b).x)/2,(P(a).y+P(b).y)/2-8,C.mut,'10px "JetBrains Mono",monospace',1); });
-    if(l2>=1){ const ph = reduce ? .3 : (time/3000)%1; const path=[['V1','S1'],['S1','R'],['R','S1'],['S1','S2'],['S2','V2']]; const seg=Math.min(4,Math.floor(ph*5)), k=ph*5-seg; const q=along(path[seg][0],path[seg][1],k); const tag = seg<2 ? 'VID '+D.iv[0][0]+' · TTL '+D.iv[0][1] : 'VID '+D.iv[1][0]+' · TTL '+D.iv[1][1]; ctx.save(); ctx.fillStyle= seg<2?C.ac:C.warm; ctx.shadowColor=ctx.fillStyle; ctx.shadowBlur=14; ctx.beginPath(); ctx.arc(q.x,q.y,5,0,7); ctx.fill(); ctx.restore(); pill(tag,q.x,q.y-16, seg<2?C.ac:C.warm, 1); }
+
+  if(L2>0){
+    const zone = (a,b,col) => { const p=P(a), q=P(b), cx=(p.x+q.x)/2, cy=(p.y+q.y)/2, r=Math.hypot(p.x-q.x,p.y-q.y)/2+sz*2; const g=ctx.createRadialGradient(cx,cy,r*.2,cx,cy,r); g.addColorStop(0,col+(.16*L2)+')'); g.addColorStop(1,col+'0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.fill(); };
+    zone('S1','V1','rgba(140,140,255,'); zone('S2','V2','rgba(242,182,90,');
+    LINKS2.forEach(([a,b,tr]) => { const p=P(a), q=along(a,b,L2); ctx.save(); ctx.globalAlpha=L2; ctx.strokeStyle= tr? C.data : 'rgba(69,210,236,.5)'; ctx.lineWidth= tr?2.6:1.6; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); });
+    ['R','S1','S2','V1','V2'].forEach(id => {
+      const n=N[id], p=P(id);
+      glyph(n.k,p.x,p.y,sz,L2,true);
+      const below = n.k==='switch' ? sz*1.3 : sz*1.5, side = id==='R', tx = side ? p.x + sz*1.4 + 44 : p.x, ty = side ? p.y - 4 : p.y+below;
+      text(n.t,tx,ty,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',L2);
+      if(n.ip) text(n.ip,tx,ty+16,C.data,mono(small?10:11),L2);
+    });
+    if(L2>=1){ const ph = reduce ? .3 : (time/3200)%1; const path=[['V1','S1'],['S1','R'],['R','S1'],['S1','S2'],['S2','V2']]; const seg=Math.min(4,Math.floor(ph*5)), k=ph*5-seg; const q=along(path[seg][0],path[seg][1],k); const v = seg<2 ? 0 : 1, col = v ? C.warm : C.ac;
+      dot(q,col,1); const r=P('R'); pill('VID '+D.iv[v][0]+' · TTL '+D.iv[v][1], r.x, (r.y+P('S1').y)/2 + 6, col, 1); }
   }
-  // nodes
-  Object.entries(N).forEach(([id,n],i) => {
-    const a = n.g===2 ? l2 : (id==='A'? win(s,-.2,.3) : id==='B'? win(s,0,.5) : win(s,.2,.7));
-    if(a<=0) return;
-    const p=P(id); const ip = n.g===2 ? 1 : win(s,1.6,2.2);
-    glyph(n.k,p.x,p.y-(1-a)*18,sz,a, s>=1.5);
-    text(n.t,p.x,p.y+sz*1.5,C.fg,'600 12px "IBM Plex Sans Arabic",sans-serif',a);
-    if(n.ip) text(n.ip,p.x,p.y+sz*1.5+15,C.data,'11px "JetBrains Mono",monospace',a*ip);
-    if(n.mac && w>560) text(n.mac,p.x,p.y+sz*1.5+29,C.mut,'10px "JetBrains Mono",monospace',a*ip*(1-win(s,2.6,3)));
-  });
 }
 function loop(t){ shown += (stage - shown) * (reduce ? 1 : .06); draw(t); requestAnimationFrame(loop); }
 size(); addEventListener('resize', size);
-if('IntersectionObserver' in window && !reduce){
-  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ stage = +e.target.dataset.stage; chaps.forEach(c => c.classList.toggle('on', c===e.target)); bars.forEach((b,i)=>b.classList.toggle('on', i<=stage)); } }), {rootMargin:'-45% 0px -45% 0px'});
+if('IntersectionObserver' in window){
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ stage = +e.target.dataset.stage; chaps.forEach(c => c.classList.toggle('on', c===e.target)); bars.forEach((b,i)=>b.classList.toggle('on', i<=stage)); } }), {rootMargin: matchMedia('(max-width:900px)').matches ? '-62% 0px -28% 0px' : '-45% 0px -45% 0px'});
   chaps.forEach(c => io.observe(c));
   chaps[0].classList.add('on'); bars[0].classList.add('on');
 } else { chaps.forEach(c=>c.classList.add('on')); bars.forEach(b=>b.classList.add('on')); }
