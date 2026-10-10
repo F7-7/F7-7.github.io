@@ -4,31 +4,29 @@ import html, json, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 from content import GUIDES
-from build import STATUS, WP
+from build import WP
 E = html.escape
 st = json.load(open(os.path.join(ROOT, "tools", "story.json")))
-hexb = st["hex_frame"][:84]
-hexs = " ".join(hexb[i:i+2] for i in range(0, len(hexb), 2))
 (hs1, _), (hs2a, hs2b), (hs3a, hs3b) = st["hs"]
 (v1, t1), (v2, t2) = st["iv"]
 
 CH = [
  ("01", "الأجهزة", "نبدأ بثلاثة أجهزة افتراضية على VMware: عميل Windows 7، وخادم Windows Server، وعميل ثانٍ لاستقبال البريد.", "fahad-PC · Windows Server · saif-PC"),
- ("02", "الوصلات", "نضع البطاقات الثلاث على نفس الشبكة الافتراضية. لا يوجد راوتر بعد: كل الأجهزة في نفس نطاق البث.", "VMware virtual network"),
+ ("02", "الوصلات", "نضع البطاقات الثلاث على نفس الـ LAN Segment في VMware. لا يوجد راوتر بعد: كل الأجهزة في نفس نطاق البث.", "VMware LAN Segment"),
  ("03", "عناوين IP", "لكل جهاز عنوان ثابت من النطاق المخصص للطالب في المعمل، من 189.120.0.57 إلى 189.120.0.64.", f"A {st['macs']['A']}\nB {st['macs']['B']}"),
  ("04", "الاختبار الأول", f"قبل أي ping يسأل الجهاز عن MAC الخادم بـ ARP. بعدها أُرسلت {st['ping']['req']} طلبات ICMP ورجعت {st['ping']['rep']} ردود، كلها بـ TTL {st['ping']['ttl']}.", st["arp"][0] + "\n" + st["arp"][1]),
  ("05", "الخدمات", "على الخادم نشغّل الخدمات التي سنحللها، وكل خدمة تنتظر على منفذها.", "FTP 21 · SMTP 587 · POP3 110 · Telnet 23"),
- ("06", "تحليل الحزم", "نفتح الالتقاط ونقرأ المصافحة الثلاثية لجلسة FTP بأرقامها الحقيقية، ثم نفكك كل إطار بايتًا بايتًا.", f"SYN      Seq={hs1}\nSYN-ACK  Seq={hs2a} Ack={hs2b}\nACK      Seq={hs3a} Ack={hs3b}"),
+ ("06", "تحليل الحزم", "نفتح Wireshark على الخادم ونقرأ المصافحة الثلاثية لجلسة FTP، ثم نفكك كل إطار بايتًا بايتًا.", f"SYN      Seq={hs1}\nSYN-ACK  Seq={hs2a} Ack={hs2b}\nACK      Seq={hs3a} Ack={hs3b}"),
  ("07", "VLAN والتوجيه", f"في المعمل الثاني نقسم الشبكة بسويتشين وراوتر في GNS3. نفس طلب ping عبر الـ Trunk مرتين: بوسم {v1} و TTL {t1}، ثم بوسم {v2} و TTL {t2}.", f"VID {v1} · TTL {t1}  →  R  →  VID {v2} · TTL {t2}"),
 ]
 
 cards = []
 for g in sorted(GUIDES, key=lambda g: g["order"]):
-    s = STATUS[g["status"]]
-    cards.append(f'<a class="card" href="guides/{g["slug"]}/"><div class="card-t"><span class="mono">{g["course"]}</span><span class="st st-{s[0]}"><i></i>{s[1]}</span></div>'
-                 f'<h3>{E(g["title"])}</h3><p>{E(g["summary"])}</p><span class="more">افتح الدليل</span></a>')
+    cards.append(f'<a class="card" href="guides/{g["slug"]}/"><div class="card-t"><span class="mono">{g["course"]}</span><span class="mono">{g["order"]:02d}</span></div>'
+                 f'<h3>{E(g["title"])}</h3><p>{E(g["summary"])}</p><span class="more">ابدأ المشروع</span></a>')
 
 chaps = "".join(f'<article class="chap" data-stage="{i}"><span class="ck mono">{n}</span><h3>{E(t)}</h3><p>{E(b)}</p><pre class="term mono" dir="ltr">{E(x)}</pre></article>' for i, (n, t, b, x) in enumerate(CH))
+ticker = "".join(f'<div class="sr p-{r["p"]}"><span>{r["no"]}</span><span>{r["t"]:.3f}</span><span>{r["src"]} → {r["dst"]}</span><span>{r["p"]}</span><span>{E(r["i"])}</span></div>' for r in st["ticker"])
 story_json = json.dumps({"macs": st["macs"], "ttl": st["ping"]["ttl"], "iv": st["iv"]})
 
 PAGE = f"""<!doctype html>
@@ -71,7 +69,24 @@ p{{margin:0}}
 
 .hero{{position:relative;padding:150px 0 70px;overflow:hidden}}
 .hero::before{{content:"";position:absolute;inset:-30% -10% auto;height:120%;background:radial-gradient(40% 50% at 70% 20%,rgba(140,140,255,.22),transparent 70%),radial-gradient(30% 40% at 25% 40%,rgba(69,210,236,.12),transparent 70%);pointer-events:none}}
-.hero .wrap{{position:relative;display:grid;gap:22px;justify-items:start}}
+.hero-g{{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 48px;align-items:center}}
+.hero-t{{display:grid;gap:22px;justify-items:start;min-width:0}}
+.hero .facts{{grid-column:1/-1}}
+.shark{{min-width:0;border:1px solid var(--line);border-radius:14px;background:rgba(15,17,26,.85);box-shadow:0 40px 80px -30px rgba(140,140,255,.35),0 0 0 1px rgba(255,255,255,.02) inset;transform:perspective(1200px) rotateY(8deg) rotateX(4deg);overflow:hidden}}
+.shark-h{{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);direction:ltr}}
+.shark-h i{{width:10px;height:10px;border-radius:50%;background:#2A2F48}}
+.shark-h span{{margin-left:10px;font-size:12px;color:var(--muted)}}
+.shark-c{{font-size:11.5px;height:300px;overflow:hidden;position:relative}}
+.sr-h,.sr{{display:grid;grid-template-columns:34px 52px 200px 44px minmax(0,1fr);gap:8px;padding:5px 12px;white-space:nowrap}}
+.sr-h{{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2)}}
+.sr span{{overflow:hidden;text-overflow:ellipsis}}
+.sr{{color:var(--fg-2);border-bottom:1px solid rgba(30,34,53,.6)}}
+.sr.p-FTP span:nth-child(4){{color:var(--data)}}
+.sr.p-TCP span:nth-child(4){{color:var(--accent-2)}}
+.sr.on{{background:rgba(140,140,255,.16);color:#fff}}
+.sr-b{{animation:roll 24s linear infinite}}
+@keyframes roll{{0%,8%{{transform:translateY(0)}}100%{{transform:translateY(-50%)}}}}
+@media (max-width:900px){{.hero-g{{grid-template-columns:minmax(0,1fr)}}.shark{{transform:none}}}}
 .pill{{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--fg-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--panel)}}
 .pill i{{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}}
 .hero h1{{font-size:clamp(2.4rem,6vw,4.6rem);font-weight:700;letter-spacing:-.02em;max-width:16ch;background:linear-gradient(180deg,#fff 30%,#A9ADD0);-webkit-background-clip:text;background-clip:text;color:transparent}}
@@ -79,7 +94,7 @@ p{{margin:0}}
 .row{{display:flex;flex-wrap:wrap;gap:12px}}
 .facts{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px;width:100%}}
 .facts div{{background:var(--panel);padding:16px 18px;display:grid;gap:2px}}
-.facts b{{font-family:var(--f-mono);font-size:1.6rem;font-weight:500}}
+.facts b{{text-align:right;font-family:var(--f-mono);font-size:1.6rem;font-weight:500}}
 .facts span{{font-size:13.5px;color:var(--muted)}}
 @media (max-width:700px){{.facts{{grid-template-columns:repeat(2,minmax(0,1fr))}}}}
 
@@ -139,16 +154,17 @@ p{{margin:0}}
 <body>
 <header class="top" id="top"><div class="wrap top-in">
 <a class="brand" href="./"><span class="logo" aria-hidden="true"></span>Fahad Net Lab</a>
-<nav class="nav" aria-label="الرئيسية"><a class="h" href="#story">الشبكة</a><a class="h" href="#guides">الأدلة</a><a class="h" href="#method">المنهجية</a><a href="{WP}" rel="noopener">المدونة</a></nav>
+<nav class="nav" aria-label="الرئيسية"><a class="h" href="#story">الشبكة</a><a class="h" href="#projects">المشاريع</a><a href="{WP}" rel="noopener">المدونة</a></nav>
 </div></header>
 
 <main>
-<section class="hero"><div class="wrap">
-<span class="pill"><i></i>كل رقم هنا مقروء من ملف التقاط حقيقي</span>
+<section class="hero"><div class="wrap hero-g"><div class="hero-t">
 <h1>نبني الشبكة، ثم نقرأ كل حزمة فيها.</h1>
-<p class="l">منصة مشاريع فهد عواد في COS 370 و COS 372. تسع أدلة من الصفر، فيها البرامج والتثبيت والأوامر والمخطط والنتائج ومستكشف حزم يفكك كل بايت.</p>
-<div class="row"><a class="btn" href="#story">ابدأ القصة</a><a class="btn ghost" href="guides/ftp/">افتح أول دليل</a></div>
-<div class="facts"><div><b>9</b><span>أدلة مشاريع</span></div><div><b>6</b><span>ملفات التقاط محللة</span></div><div><b>{st['ping']['rep']}/{st['ping']['req']}</b><span>ردود ping ناجحة</span></div><div><b>{t1}→{t2}</b><span>TTL عبر الراوتر</span></div></div>
+<p class="l">تسعة مشاريع في بروتوكولات الشبكات ومحاكاتها. كل مشروع يبدأ من الصفر: البرامج، والإعداد، والأوامر، ثم نفتح الحزم ونقرأها بايتًا بايتًا.</p>
+<div class="row"><a class="btn" href="#story">شاهد الشبكة تُبنى</a><a class="btn ghost" href="#projects">المشاريع</a></div>
+</div>
+<div class="shark" aria-hidden="true"><div class="shark-h"><i></i><i></i><i></i><span class="mono">ftp.pcapng — Wireshark</span></div><div class="shark-c mono" dir="ltr"><div class="sr-h"><span>No.</span><span>Time</span><span>Source → Destination</span><span>Proto</span><span>Info</span></div><div class="sr-b">{ticker}{ticker}</div></div></div>
+<div class="facts"><div><b>9</b><span>مشاريع</span></div><div><b>9</b><span>بروتوكولات</span></div><div><b>{st['ping']['rep']}/{st['ping']['req']}</b><span>ردود ping</span></div><div><b dir="ltr">{t1} → {t2}</b><span>TTL عبر الراوتر</span></div></div>
 </div></section>
 
 <section class="story" id="story" aria-label="بناء الشبكة خطوة بخطوة"><div class="wrap story-g">
@@ -156,19 +172,11 @@ p{{margin:0}}
 <div class="stage" aria-hidden="true"><canvas id="net"></canvas><div class="prog">{''.join('<i><b></b></i>' for _ in CH)}</div></div>
 </div></section>
 
-<section class="sec" id="guides"><div class="wrap">
-<div class="sec-h"><span class="eyb">GUIDES</span><h2>تسعة أدلة من الصفر</h2><p>كل دليل يبدأ بالبرامج وروابطها الرسمية، وينتهي بقائمة تحقق وملخص جاهز لـ LinkedIn.</p></div>
+<section class="sec" id="projects"><div class="wrap">
+<div class="sec-h"><span class="eyb">PROJECTS</span><h2>المشاريع</h2><p>اختر مشروعًا وامشِ معه خطوة بخطوة.</p></div>
 <div class="cards">{''.join(cards)}</div>
 </div></section>
 
-<section class="sec" id="method" style="padding-top:0"><div class="wrap">
-<div class="sec-h"><span class="eyb">METHOD</span><h2>من أين تأتي الأرقام</h2><p>المنصة لا تكتب أي Seq أو Ack أو Hex باليد. سكربت يقرأ ملفات pcapng ويبني الصفحات منها، ويعيد كل الحسابات في كل مرة.</p></div>
-<div class="method">
-<div><span class="k ok">● من ملف التقاط</span><b>ستة مشاريع</b><p>النتائج ومستكشف الحزم والتحقق الآلي من TCP مقروءة من الإطارات مباشرة، ومع كل نتيجة رقم الإطار الذي جاءت منه.</p></div>
-<div><span class="k ac">● سيناريو نظري أو تقرير</span><b>ثلاثة مشاريع</b><p>Piggybacking وإعادة الإرسال وتاريخ Ethernet. القيم من التقرير، والحسابات الممكنة تُعاد آليًا.</p></div>
-<div><span class="k wm">● بانتظار ملف</span><b>Telnet</b><p>القيم معروضة كما في التقرير وموسومة بأنها غير متحقق منها، حتى يصل ملف الالتقاط.</p></div>
-</div>
-</div></section>
 </main>
 <footer class="foot"><div class="wrap"><span>© 2026 فهد عواد · Fahad Net Lab</span><span>جامعة الملك سعود · كلية علوم الحاسب التطبيقية</span></div></footer>
 
@@ -222,7 +230,7 @@ function draw(time){{
   // lab 1 links
   const lk = win(s,.6,1.4);
   LINKS1.forEach(([a,b]) => {{ const p=P(a), q=along(a,b,lk); if(lk<=0) return; ctx.save(); ctx.strokeStyle=C.ac; ctx.globalAlpha=.8; ctx.lineWidth=2; ctx.shadowColor=C.ac; ctx.shadowBlur=8; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke(); ctx.restore(); }});
-  if(lk>=1) text('VMware virtual network', (P('A').x+P('C').x)/2, P('A').y - sz*2.2, C.mut, '11px "JetBrains Mono",monospace', win(s,1.2,1.6));
+  if(lk>=1) text('VMware LAN Segment', (P('A').x+P('C').x)/2, P('A').y - sz*2.2, C.mut, '11px "JetBrains Mono",monospace', win(s,1.2,1.6));
   // test: ARP then ICMP between A and B
   const te = win(s,2.6,3.2) * (1 - win(s,3.8,4.2));
   if(te>0){{

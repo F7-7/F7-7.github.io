@@ -89,7 +89,14 @@
     XP[cap] = { root, show, list };
   });
   const firstCap = Object.keys(XP)[0];
-  $$('.fref').forEach(b => b.addEventListener('click', () => {
+  /* sequence diagrams: draw arrows as they come into view */
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const rows = $$('.fr'); const vh = innerHeight;
+    rows.forEach((r, i) => { if (r.getBoundingClientRect().top > vh) r.classList.add('pre'); });
+    const io2 = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove('pre'); io2.unobserve(e.target); } }), { rootMargin: '0px 0px -10% 0px' });
+    rows.forEach(r => io2.observe(r));
+  }
+  $$('.fref, .fr[data-frame]').forEach(b => b.addEventListener('click', () => {
     const x = XP[b.dataset.cap || firstCap]; if (!x) return;
     x.show(+b.dataset.frame);
     const r = $(`.xr[data-no="${b.dataset.frame}"]`, x.list); if (r) { r.hidden = false; r.scrollIntoView({ block: 'nearest' }); }
