@@ -128,8 +128,8 @@ p{margin:0}
 .filters{display:flex;gap:8px;flex-wrap:wrap}
 .filters button{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--paper-line);background:#fff;color:var(--paper-fg);border-radius:999px;padding:8px 16px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
 .filters button[aria-pressed="true"]{background:var(--paper-fg);color:#fff;border-color:var(--paper-fg)}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
-@media (max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+
 @media (max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.grid{grid-template-columns:1fr}}
 .pcard{display:grid;grid-template-rows:auto 1fr;background:#fff;border:1px solid var(--paper-line);border-radius:18px;overflow:hidden;text-decoration:none;color:var(--paper-fg);transition:transform .3s,box-shadow .3s}
@@ -264,8 +264,8 @@ html.armed .rv:not(.in){transform:translateY(22px)}
       <span class="eyebrow">THE LAB</span>
       <h2 class="rv">مشاريع حقيقية، من أول كيبل إلى آخر بايت.</h2>
       <div class="counters rv">
-        <div class="counter"><b data-n="8">8</b><span>مشاريع مشروحة</span></div>
-        <div class="counter"><b data-n="8">8</b><span>بروتوكولات مفككة</span></div>
+        <div class="counter"><b data-n="9">9</b><span>مشاريع مشروحة</span></div>
+        <div class="counter"><b data-n="9">9</b><span>بروتوكولات مفككة</span></div>
         <div class="counter"><b data-n="10240">10240</b><span>بايت في أكبر مقطع التقطته</span></div>
         <div class="counter"><b data-n="2">2</b><span>مواد جامعية</span></div>
       </div>
@@ -345,7 +345,7 @@ html.armed .rv:not(.in){transform:translateY(22px)}
         <div class="fact"><span>الجامعة</span><span>جامعة الملك سعود · فرع المزاحمية</span></div>
         <div class="fact"><span>المواد</span><span class="mono">COS 370 · COS 372</span></div>
         <div class="fact"><span>الأدوات</span><span class="mono">Wireshark · VMware · GNS3</span></div>
-        <div class="fact"><span>الأنظمة</span><span class="mono">Windows Server 2025 · Cisco IOS</span></div>
+        <div class="fact"><span>الأنظمة</span><span class="mono">Windows Server 2012 R2 / 2025 · Cisco IOS</span></div>
       </div>
     </div>
   </section>
@@ -397,6 +397,7 @@ html.armed .rv:not(.in){transform:translateY(22px)}
     {id:7, c:'COS 370', t:'التقاط جلسة FTP', d:'قناة تحكم على 21 وقناة بيانات على 49672، وفك لغز الـ Passive Mode.', art:'ftp'},
     {id:8, c:'COS 370', t:'FTP Bulk · ملف 10KB', d:'نحمّل 10240 بايت بأمر RETR ونتابع اتصال البيانات من فتحه لين يتسكر.', art:'bulk'},
     {id:9, c:'COS 370', t:'سيرفر بريد: SMTP و POP3', d:'إيميل ينرسل على 587 وينسحب على 110، و Base64 مكشوف لأي أحد يلتقط.', art:'mail'},
+    {id:55, c:'COS 370', t:'جلسة Telnet', d:'تفاوض IAC بين الطرفين، ومحاولة NTLM فاشلة، وكلمة مرور تنرسل حرف حرف بنص واضح.', art:'telnet'},
     {id:10, c:'COS 372', t:'ARP و ICMP', d:'وش يصير لما تكتب ping: أربع إطارات مفككة بايت ببايت.', art:'ping'},
     {id:11, c:'COS 372', t:'VLAN و InterVLAN', d:'Tag الـ 802.1Q بعيننا، و Router on a Stick بين VLAN 10 و VLAN 20.', art:'vlan'},
     {id:12, c:'COS 372', t:'تاريخ Ethernet', d:'من 10 Mbps في 1983 إلى 800 Gbps اليوم، في جدول وأربع مراحل.', art:'eth'}
@@ -435,6 +436,15 @@ html.armed .rv:not(.in){transform:translateY(22px)}
       `<circle cx="80" cy="90" r="60" fill="none" stroke="${S}" stroke-width="1.5" class="a-ring" style="animation-delay:-1.2s"/>`+
       `<g class="a-r" style="animation-duration:2.4s"><circle cx="40" cy="90" r="5" fill="${D}" transform="translate(60,0)"/></g>`+
       txt(160,150,'ARP → ICMP ECHO',M),
+    telnet: ()=> box(14,96,40,48)+box(266,96,40,48)+
+      `<line x1="54" y1="120" x2="266" y2="120" stroke="${L}" stroke-width="2"/>`+
+      `<rect x="96" y="18" width="128" height="58" rx="6" fill="#050C18" stroke="${L}"/>`+
+      `<text x="106" y="40" font-family="JetBrains Mono,monospace" font-size="10" fill="${S}">login: fahad</text>`+
+      `<text x="106" y="60" font-family="JetBrains Mono,monospace" font-size="10" fill="${D}">password: ****</text>`+
+      `<rect x="204" y="51" width="7" height="11" fill="${S}" class="a-blink"/>`+
+      `<g class="a-r" style="animation-duration:2.6s"><rect x="44" y="112" width="16" height="16" rx="3" fill="${D}"/></g>`+
+      `<g class="a-l" style="animation-duration:2.6s;animation-delay:-1.3s"><rect x="260" y="112" width="16" height="16" rx="3" fill="${S}"/></g>`+
+      txt(160,166,'IAC FF FB 01 · ECHO',M),
     vlan: ()=> `<rect x="16" y="20" width="136" height="120" rx="12" fill="rgba(42,212,196,.08)" stroke="${S}" stroke-dasharray="4 4"/>`+
       `<rect x="168" y="20" width="136" height="120" rx="12" fill="rgba(245,165,36,.08)" stroke="${D}" stroke-dasharray="4 4"/>`+
       box(54,70,60,20,S)+box(206,70,60,20,D)+`<line x1="114" y1="80" x2="206" y2="80" stroke="#fff" stroke-width="3"/>`+
