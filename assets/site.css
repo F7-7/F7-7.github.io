@@ -245,6 +245,7 @@ details.err p{font-size:15px;color:var(--fg-2);margin-bottom:6px}
 .ghero h1{font-size:clamp(2rem,3.8vw,3.1rem);font-weight:700;letter-spacing:-.015em;color:#fff}
 .ghero .lead{font-size:18px;color:#B9BDD6;max-width:52ch}
 .learn{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:6px 0 0}
+.rep{display:inline-flex;justify-self:start;align-self:start;width:max-content;max-width:100%;align-items:center;gap:8px;margin-top:14px;font-size:14px;font-weight:600;color:#fff;background:linear-gradient(135deg,#6b6bff,#3fb6d4);padding:9px 16px;border-radius:10px;text-decoration:none;box-shadow:0 8px 24px -10px rgba(107,107,255,.8)}.rep:hover{filter:brightness(1.1)}
 .learn li{font-size:13px;border:1px solid var(--line-2);border-radius:999px;padding:4px 12px;color:#C9CDE6;background:rgba(255,255,255,.03)}
 .ghero-v{min-width:0}
 .ghero .topo{background:rgba(255,255,255,.02);margin:0}

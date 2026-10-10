@@ -449,7 +449,9 @@ def guide_page(g):
           + (f'<a class="nx" href="../{nxt["slug"]}/"><span>التالي</span><b>{E(nxt["title"])}</b></a>' if nxt else "") + "</nav>")
     learn = "".join(f"<li>{E(x)}</li>" for x in g["learn"])
     hero = (f'<header class="ghero"><div class="ghero-in"><div class="ghero-t"><p class="crumb mono">{g["course"]} · {g["order"]:02d}</p><h1>{E(g["title"])}</h1>'
-            f'<p class="lead">{E(g["summary"])}</p><ul class="learn">{learn}</ul></div>'
+            f'<p class="lead">{E(g["summary"])}</p><ul class="learn">{learn}</ul>'
+            + (f'<a class="rep" href="../../reports/{g["slug"]}.pdf" download><span aria-hidden="true">↓</span> تقرير المشروع · PDF · {os.path.getsize(os.path.join(ROOT, "reports", g["slug"] + ".pdf")) // 1024} KB</a>' if os.path.exists(os.path.join(ROOT, "reports", g["slug"] + ".pdf")) else "")
+            + '</div>'
             + (f'<div class="ghero-v">{topo_svg(g["topo"])}' + (f'<p class="cap">{E(g["ip_note"])}</p>' if g["ip_note"] else "") + '</div>' if g["topo"] else "") + '</div></header>')
     tocl = "".join(f'<li><a href="#{a}">{E(b)}</a></li>' for a, b in toc)
     page = (head(f'{g["title"]} · Fahad Net Lab', g["summary"], 2) + hero
