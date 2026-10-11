@@ -352,7 +352,7 @@ def sidebar(active):
     out.append("</nav>")
     return "".join(out)
 
-def head(title, desc, depth, other):
+def head(title, desc, depth, other, img="og.png"):
     pre = "../" * depth
     home = pre + ("ar/" if LANG == "ar" else "")
     return f"""<!doctype html>
@@ -364,7 +364,7 @@ def head(title, desc, depth, other):
 <meta name="description" content="{E(desc)}">
 <meta property="og:title" content="{E(title)}">
 <meta property="og:description" content="{E(desc)}">
-<meta property="og:image" content="https://f7-7.github.io/assets/og.png"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://f7-7.github.io/assets/{img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111433'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%237C83FF' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -475,7 +475,8 @@ def guide_page(g):
             + (f'<div class="ghero-v">{topo_svg(g["topo"])}' + (f'<p class="cap">{E(g["ip_note"])}</p>' if g["ip_note"] else "") + '</div>' if g["topo"] else "") + '</div></header>')
     tocl = "".join(f'<li><a href="#{a}">{E(b)}</a></li>' for a, b in toc)
     other = t(f"{PRE}guides/{g['slug']}/", f"{PRE}ar/guides/{g['slug']}/")
-    page = (head(f'{g["title"]} · Fahad Net Lab', g["summary"], 3 if LANG == "ar" else 2, other) + hero
+    page = (head(f'{g["title"]} · Fahad Net Lab', g["summary"], 3 if LANG == "ar" else 2, other,
+                 f'og/{g["slug"]}.jpg' if os.path.exists(os.path.join(ROOT, "assets", "og", g["slug"] + ".jpg")) else "og.png") + hero
             + f'<div class="docs">{sidebar(g["slug"])}<main id="main" class="doc">{"".join(sec)}{pn}</main><aside class="toc" aria-label="{t('في هذه الصفحة', 'On this page')}"><p>{t('في هذه الصفحة', 'On this page')}</p><ul>{tocl}</ul></aside></div>'
             + FOOT.replace("{pre}", PRE).replace("{me}", t("فهد عواد", "Fahad Awad")).replace("{uni}", t("جامعة الملك سعود", "King Saud University")))
     d = os.path.join(OUT(), "guides", g["slug"]); os.makedirs(d, exist_ok=True)
