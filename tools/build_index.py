@@ -37,7 +37,8 @@ for LANG in ("en", "ar"):
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-    <title>Fahad Net Lab · {T("منصة مشاريع الشبكات", "Networking projects")}</title>
+    <title>Fahad Awad · Fahad Net Lab · {T("منصة مشاريع الشبكات", "Networking projects")}</title>
+    <meta name="author" content="Fahad Awad">
     <meta name="description" content="{T("منصة تعليمية تبني الشبكة خطوة بخطوة وتشرح كل حزمة من ملفات التقاط حقيقية. مشاريع COS 370 و COS 372 لفهد عواد.", "A learning platform that builds a network step by step and explains every packet from real captures. COS 370 and COS 372 projects by Fahad Awad.")}">
     <meta property="og:title" content="Fahad Net Lab"><meta property="og:image" content="https://f7-7.github.io/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"><meta property="og:url" content="https://f7-7.github.io/"><meta name="twitter:card" content="summary_large_image"><meta property="og:description" content="{T("نبني الشبكة ونفهم كل حزمة فيها، من ملفات التقاط حقيقية.", "Build the network, then understand every packet in it, from real captures.")}">
     {PERSON_LD}
@@ -72,6 +73,7 @@ for LANG in ("en", "ar"):
     .btn.ghost{{background:transparent;color:var(--fg);border:1px solid var(--line)}}
     @media (max-width:760px){{.nav a.h{{display:none}}}}
 
+    .byline{{margin:0;color:var(--accent-2);font-size:14px;letter-spacing:.04em}}
     .hero{{position:relative;padding:150px 0 70px;overflow:hidden}}
     .hero::before{{content:"";position:absolute;inset:-30% -10% auto;height:120%;background:radial-gradient(40% 50% at 70% 20%,rgba(140,140,255,.22),transparent 70%),radial-gradient(30% 40% at 25% 40%,rgba(69,210,236,.12),transparent 70%);pointer-events:none}}
     .hero-g{{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 48px;align-items:center}}
@@ -164,6 +166,7 @@ for LANG in ("en", "ar"):
 
     <main>
     <section class="hero"><div class="wrap hero-g"><div class="hero-t">
+    <p class="byline mono" dir="ltr">Fahad Awad · King Saud University</p>
     <h1>{T("نبني الشبكة، ثم نقرأ كل حزمة فيها.", "Build the network. Then read every packet in it.")}</h1>
     <p class="l">{T("تسعة مشاريع في بروتوكولات الشبكات ومحاكاتها. كل مشروع يبدأ من الصفر: البرامج، والإعداد، والأوامر، ثم نفتح الحزم ونقرأها بايتًا بايتًا.", "Nine projects in network protocols and simulation. Each one starts from zero: the software, the setup, the commands, then we open the packets and read them byte by byte.")}</p>
     <div class="row"><a class="btn" href="#story">{T("شاهد الشبكة تُبنى", "Watch it being built")}</a><a class="btn ghost" href="#projects">{T("المشاريع", "Projects")}</a></div>
