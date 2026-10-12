@@ -352,6 +352,9 @@ def sidebar(active):
     out.append("</nav>")
     return "".join(out)
 
+PERSON_LD = '<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Fahad Awad","alternateName":["فهد عواد","فهد وليد عواد"],"url":"https://f7-7.github.io/","affiliation":{"@type":"CollegeOrUniversity","name":"King Saud University"},"knowsAbout":["Computer networks","Wireshark","Packet analysis","VLAN","Cisco IOS","GNS3","Cybersecurity"],"sameAs":["https://www.linkedin.com/in/fahad-awad","https://github.com/F7-7"]}</script>'
+LINKS = '<a href="https://www.linkedin.com/in/fahad-awad" rel="me noopener" target="_blank">LinkedIn</a> · <a href="https://github.com/F7-7" rel="me noopener" target="_blank">GitHub</a>'
+
 def head(title, desc, depth, other, img="og.png"):
     pre = "../" * depth
     home = pre + ("ar/" if LANG == "ar" else "")
@@ -365,6 +368,7 @@ def head(title, desc, depth, other, img="og.png"):
 <meta property="og:title" content="{E(title)}">
 <meta property="og:description" content="{E(desc)}">
 <meta property="og:image" content="https://f7-7.github.io/assets/{img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"><meta name="twitter:card" content="summary_large_image">
+{PERSON_LD}
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111433'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%237C83FF' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -381,7 +385,7 @@ def head(title, desc, depth, other, img="og.png"):
 <button class="menu" type="button" aria-label="{t('قائمة المشاريع', 'Project menu')}" aria-expanded="false"><span aria-hidden="true"></span></button>
 </div></header>"""
 
-FOOT = """<footer class="foot"><div class="foot-in"><span>© 2026 {me} · Fahad Net Lab</span><span>{uni} · COS 370 · COS 372</span></div></footer>
+FOOT = """<footer class="foot"><div class="foot-in"><span>© 2026 {me} · Fahad Net Lab · """ + LINKS + """</span><span>{uni} · COS 370 · COS 372</span></div></footer>
 <script src="{pre}assets/site.js" defer></script>
 </body></html>"""
 

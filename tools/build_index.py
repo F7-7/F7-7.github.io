@@ -4,7 +4,7 @@ import html, json, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import content as CA, content_en as CE
-from build import WP
+from build import WP, PERSON_LD, LINKS
 E = html.escape
 st = json.load(open(os.path.join(ROOT, "tools", "story.json")))
 (hs1, _), (hs2a, hs2b), (hs3a, hs3b) = st["hs"]
@@ -40,6 +40,7 @@ for LANG in ("en", "ar"):
     <title>Fahad Net Lab · {T("منصة مشاريع الشبكات", "Networking projects")}</title>
     <meta name="description" content="{T("منصة تعليمية تبني الشبكة خطوة بخطوة وتشرح كل حزمة من ملفات التقاط حقيقية. مشاريع COS 370 و COS 372 لفهد عواد.", "A learning platform that builds a network step by step and explains every packet from real captures. COS 370 and COS 372 projects by Fahad Awad.")}">
     <meta property="og:title" content="Fahad Net Lab"><meta property="og:image" content="https://f7-7.github.io/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"><meta property="og:url" content="https://f7-7.github.io/"><meta name="twitter:card" content="summary_large_image"><meta property="og:description" content="{T("نبني الشبكة ونفهم كل حزمة فيها، من ملفات التقاط حقيقية.", "Build the network, then understand every packet in it, from real captures.")}">
+    {PERSON_LD}
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111433'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%237C83FF' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -182,7 +183,7 @@ for LANG in ("en", "ar"):
     </div></section>
 
     </main>
-    <footer class="foot"><div class="wrap"><span>© 2026 {T("فهد عواد", "Fahad Awad")} · Fahad Net Lab</span><span>{T("جامعة الملك سعود · كلية علوم الحاسب التطبيقية", "King Saud University · College of Applied Computer Science")}</span></div></footer>
+    <footer class="foot"><div class="wrap"><span>© 2026 {T("فهد عواد", "Fahad Awad")} · Fahad Net Lab · {LINKS}</span><span>{T("جامعة الملك سعود · كلية علوم الحاسب التطبيقية", "King Saud University · College of Applied Computer Science")}</span></div></footer>
 
     <script>
     (function(){{
