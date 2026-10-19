@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TikTok Username Finder</title>
+<meta name="description" content="Generate TikTok username ideas by keyword, length and style, then verify each one on TikTok with a fast manual checking workflow. Not affiliated with TikTok.">
+<meta name="author" content="Fahad Awad">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='17' text-anchor='middle' fill='%2325F4EE'%3E@%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#results">Skip to results</a>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="./"><span class="logo" aria-hidden="true">@</span><span>Username Finder</span></a>
+    <nav class="nav" aria-label="Site">
+      <a href="#how">How checking works</a>
+      <a href="../">f7-7.github.io</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1><span class="glitch" data-text="Find a TikTok username">Find a TikTok username</span> you can actually claim.</h1>
+    <p class="lede">Generate hundreds of ideas by keyword, length and style. Then verify them on TikTok one by one. Nothing is marked <b>available</b> until you've confirmed it yourself.</p>
+    <p class="notice" role="note"><span class="dot" aria-hidden="true"></span><span>TikTok has no public username-availability API, so this tool never guesses. Every name starts as <b>Unverified</b>, with a direct link to check it.</span></p>
+  </section>
+
+  <form id="gen" class="panel gen" autocomplete="off">
+    <h2 class="sr-only">Generation controls</h2>
+    <div class="grid">
+      <label class="field span2"><span>Keywords <em>name, niche, interests: comma-separated</em></span>
+        <input id="keywords" name="keywords" placeholder="e.g. fahad awad, coffee, travel" maxlength="200"></label>
+      <label class="field"><span>Initials <em>optional</em></span>
+        <input id="initials" name="initials" placeholder="e.g. fa" maxlength="20"></label>
+      <label class="field"><span>Preferred words <em>optional</em></span>
+        <input id="words" name="words" placeholder="e.g. night, vibes" maxlength="120"></label>
+    </div>
+
+    <fieldset class="chips" id="styles">
+      <legend>Styles</legend>
+      <label><input type="checkbox" name="style" value="minimal" checked><span>Minimal</span></label>
+      <label><input type="checkbox" name="style" value="aesthetic" checked><span>Aesthetic</span></label>
+      <label><input type="checkbox" name="style" value="professional" checked><span>Professional</span></label>
+      <label><input type="checkbox" name="style" value="gaming" checked><span>Gaming</span></label>
+      <label><input type="checkbox" name="style" value="rare" checked><span>Rare-looking</span></label>
+    </fieldset>
+
+    <div class="row">
+      <fieldset class="seg" id="length">
+        <legend>Length</legend>
+        <label><input type="radio" name="length" value="3-5"><span>3–5</span></label>
+        <label><input type="radio" name="length" value="6-8" checked><span>6–8</span></label>
+        <label><input type="radio" name="length" value="9-12"><span>9–12</span></label>
+        <label><input type="radio" name="length" value="any"><span>Any</span></label>
+      </fieldset>
+      <fieldset class="chips" id="chars">
+        <legend>Allowed characters</legend>
+        <label><input type="checkbox" name="allowUnderscore" checked><span>Underscore _</span></label>
+        <label><input type="checkbox" name="allowPeriod" checked><span>Period .</span></label>
+        <label><input type="checkbox" name="allowNumbers"><span>Numbers</span></label>
+      </fieldset>
+    </div>
+
+    <details class="more">
+      <summary>Exclusions and batch size</summary>
+      <div class="grid">
+        <label class="field"><span>Exclude characters <em>e.g. x q z</em></span>
+          <input id="excludeChars" name="excludeChars" maxlength="40"></label>
+        <label class="field"><span>Exclude words <em>comma-separated</em></span>
+          <input id="excludeWords" name="excludeWords" maxlength="200"></label>
+        <label class="field"><span>Suggestions per batch</span>
+          <input id="count" name="count" type="number" min="20" max="500" step="10" value="120" inputmode="numeric"></label>
+        <label class="field check"><input type="checkbox" id="append" name="append"><span>Add to current results instead of replacing them</span></label>
+      </div>
+    </details>
+
+    <div class="actions">
+      <button class="btn primary" type="submit" id="generate">Generate usernames</button>
+      <p id="genMsg" class="msg" role="status" aria-live="polite"></p>
+    </div>
+  </form>
+
+  <section id="results" class="results" aria-labelledby="resultsTitle">
+    <div class="results-head">
+      <h2 id="resultsTitle">Results</h2>
+      <div class="progress" aria-labelledby="progLabel">
+        <div class="bar" role="progressbar" id="progBar" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><i id="progFill"></i></div>
+        <span id="progLabel" class="muted">Checked 0 of 0</span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Verification status">
+      <button role="tab" data-tab="all" aria-selected="true">All <b id="c-all">0</b></button>
+      <button role="tab" data-tab="available" aria-selected="false"><i class="s s-available"></i>Confirmed available <b id="c-available">0</b></button>
+      <button role="tab" data-tab="todo" aria-selected="false"><i class="s s-unverified"></i>Needs checking <b id="c-todo">0</b></button>
+      <button role="tab" data-tab="notfound" aria-selected="false"><i class="s s-notfound"></i>No profile found <b id="c-notfound">0</b></button>
+      <button role="tab" data-tab="taken" aria-selected="false"><i class="s s-taken"></i>Taken <b id="c-taken">0</b></button>
+      <button role="tab" data-tab="fav" aria-selected="false">★ Favorites <b id="c-fav">0</b></button>
+    </div>
+
+    <div class="toolbar panel">
+      <form id="addForm" class="search" role="search">
+        <label for="q" class="sr-only">Search results or type a username to add</label>
+        <input id="q" type="search" placeholder="Search, or add a username" maxlength="24" autocapitalize="off" spellcheck="false">
+        <button class="btn sm" type="submit" id="addBtn">Add</button>
+      </form>
+      <div class="filters">
+        <label><span class="sr-only">Length filter</span><select id="fLen">
+          <option value="">Any length</option><option value="3-5">3–5</option><option value="6-8">6–8</option><option value="9-12">9–12</option><option value="13-24">13+</option></select></label>
+        <label><span class="sr-only">Character filter</span><select id="fChars">
+          <option value="">Any characters</option><option value="letters">Letters only</option><option value="digits">Has numbers</option><option value="underscore">Has _</option><option value="period">Has .</option></select></label>
+        <label><span class="sr-only">Style filter</span><select id="fStyle">
+          <option value="">Any style</option><option value="minimal">Minimal</option><option value="aesthetic">Aesthetic</option><option value="professional">Professional</option><option value="gaming">Gaming</option><option value="rare">Rare-looking</option><option value="custom">Added by you</option></select></label>
+        <label><span class="sr-only">Status filter</span><select id="fStatus">
+          <option value="">Any status</option><option value="unverified">Unverified</option><option value="notfound">No profile found</option><option value="available">Confirmed available</option><option value="taken">Taken</option><option value="unknown">Couldn't tell</option></select></label>
+        <label><span class="sr-only">Sort</span><select id="sort">
+          <option value="mix">Best mix</option><option value="score">Most readable</option><option value="az">A–Z</option><option value="short">Shortest</option></select></label>
+      </div>
+      <div class="bulk">
+        <button class="btn primary sm" id="checkMode" type="button">Start checking ▸</button>
+        <button class="btn ghost sm" id="expTxt" type="button">Export TXT</button>
+        <button class="btn ghost sm" id="expCsv" type="button">Export CSV</button>
+        <button class="btn ghost sm danger" id="clear" type="button">Clear results</button>
+      </div>
+    </div>
+
+    <p id="listMsg" class="msg" role="status" aria-live="polite"></p>
+    <ul id="list" class="list" aria-label="Usernames"></ul>
+    <div id="empty" class="empty">
+      <p><b>No usernames yet.</b> Enter a keyword or two and press <b>Generate</b>. Leave everything blank for pure coined names.</p>
+    </div>
+    <button id="more" class="btn ghost more-btn" type="button" hidden>Show more</button>
+  </section>
+
+  <section id="how" class="panel how">
+    <h2>How checking works</h2>
+    <ol>
+      <li><b>Open the profile.</b> The <span class="kbd">Open</span> button loads <span class="mono">tiktok.com/@name</span> in one reusable tab. If a profile shows up, mark it <span class="tag s-taken">Taken</span>.</li>
+      <li><b>“Couldn't find this account”</b> doesn't mean it's free. Banned, deleted and reserved names show the same page. Mark it <span class="tag s-notfound">No profile found</span>.</li>
+      <li><b>Confirm in the app.</b> In TikTok go to <i>Profile → Edit profile → Username</i> and type the name. If TikTok accepts it, mark it <span class="tag s-available">Confirmed available</span>. Only this step proves a name is free.</li>
+    </ol>
+    <p class="muted">Check at a human pace. Fast lookups get rate-limited. This tool never asks for your TikTok password, cookies or tokens, and makes no requests to TikTok itself. Your results, favorites and statuses stay in this browser. TikTok lets you change your username once every 30 days. Not affiliated with or endorsed by TikTok.</p>
+  </section>
+</main>
+
+<dialog id="checker" aria-labelledby="ckName">
+  <div class="ck">
+    <div class="ck-head">
+      <span class="muted" id="ckPos">1 / 1</span>
+      <button class="icon" id="ckClose" type="button" aria-label="Close checking mode">✕</button>
+    </div>
+    <p class="ck-name mono" id="ckName">@name</p>
+    <p class="ck-status" id="ckStatus"></p>
+    <div class="ck-open">
+      <a class="btn primary" id="ckOpen" target="tt-check" rel="noopener noreferrer">Open on TikTok ↗ <span class="kbd">O</span></a>
+      <button class="btn ghost" id="ckCopy" type="button">Copy <span class="kbd">C</span></button>
+    </div>
+    <p class="muted small">What did TikTok show?</p>
+    <div class="ck-marks">
+      <button class="mark s-taken" data-mark="taken" type="button">Profile exists: Taken <span class="kbd">T</span></button>
+      <button class="mark s-notfound" data-mark="notfound" type="button">“Couldn't find this account” <span class="kbd">N</span></button>
+      <button class="mark s-available" data-mark="available" type="button">Accepted in Edit profile: Available <span class="kbd">A</span></button>
+      <button class="mark s-unknown" data-mark="unknown" type="button">Couldn't tell <span class="kbd">U</span></button>
+    </div>
+    <div class="ck-nav">
+      <button class="btn ghost sm" id="ckPrev" type="button">◂ Prev</button>
+      <button class="btn ghost sm" id="ckFav" type="button" aria-pressed="false">☆ Favorite <span class="kbd">F</span></button>
+      <button class="btn ghost sm" id="ckNext" type="button">Skip ▸ <span class="kbd">S</span></button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<noscript><p class="wrap">This tool needs JavaScript to generate usernames.</p></noscript>
+</body>
+</html>
