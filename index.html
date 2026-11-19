@@ -8,110 +8,131 @@
     <meta name="description" content="A learning platform that builds a network step by step and explains every packet from real captures. COS 370 and COS 372 projects by Fahad Awad.">
     <meta property="og:title" content="Fahad Net Lab"><meta property="og:image" content="https://f7-7.github.io/assets/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627"><meta property="og:url" content="https://f7-7.github.io/"><meta name="twitter:card" content="summary_large_image"><meta property="og:description" content="Build the network, then understand every packet in it, from real captures.">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Fahad Awad","alternateName":["فهد عواد","فهد وليد عواد"],"url":"https://f7-7.github.io/","affiliation":{"@type":"CollegeOrUniversity","name":"King Saud University"},"knowsAbout":["Computer networks","Wireshark","Packet analysis","VLAN","Cisco IOS","GNS3","Cybersecurity"],"sameAs":["https://www.linkedin.com/in/fahad-awad","https://github.com/F7-7"]}</script>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111433'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%237C83FF' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2316233A'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='%23F2B33D' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
     <style>
-    /* Landing: one committed dark world. A sticky canvas draws the lab while chapters scroll past it. */
-    :root{--ink:#08090F;--panel:#0F111A;--panel-2:#141726;--line:#1E2235;--fg:#EDEEF7;--fg-2:#B9BDD6;--muted:#7F85A6;
-      --accent:#8C8CFF;--accent-2:#B4A5FF;--data:#45D2EC;--warm:#F2B65A;--ok:#4FD39A;
+    /* Landing (light). Cream page, navy ink, mustard actions, lavender accent; the capture and the lab drawing sit on dark "screens". */
+    :root{--ink:#F8F5EE;--panel:#FFFFFF;--panel-2:#FBF8F2;--line:#E6DFD0;--fg:#16233A;--fg-2:#3A465C;--muted:#667085;
+      --accent:#5B3FE0;--accent-2:#6C4CF1;--data:#0E7C8C;--warm:#F2B33D;--ok:#0F7A52;
+      --screen:#0F1730;--screen-2:#141E3B;--screen-line:#24304F;--s-fg:#E3E8F5;--s-fg2:#B6BFD6;--s-mut:#7F8AA8;--s-ac:#9C8CFF;--s-data:#45D2EC;
       --f-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
-      --gutter:clamp(16px,4vw,48px);color-scheme:dark}
+      --ez:cubic-bezier(.22,1,.36,1);--gutter:clamp(16px,4vw,48px);color-scheme:light}
     *{box-sizing:border-box}
     body{margin:0;background:var(--ink);color:var(--fg);font-family:var(--f-ui);font-size:17px;line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    ::selection{background:var(--warm);color:var(--fg)}
     a{color:inherit;text-decoration:none}
-    h1,h2,h3{margin:0;line-height:1.25;text-wrap:balance}
+    h1,h2,h3{margin:0;line-height:1.2;text-wrap:balance}
     p{margin:0}
     .mono{font-family:var(--f-mono)}
     :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
     .wrap{max-width:1240px;margin:0 auto;padding-inline:var(--gutter)}
     .top{position:fixed;top:0;inset-inline:0;z-index:20;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
-    .top.solid{background:rgba(8,9,15,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}
-    .top-in{display:flex;align-items:center;gap:22px;height:62px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-    .logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(140deg,var(--accent),var(--data))}
+    .top.solid{background:rgba(248,245,238,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}
+    .top-in{display:flex;align-items:center;gap:22px;height:64px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--fg)}
+    .logo{width:28px;height:28px;border-radius:9px;background:var(--fg);position:relative;flex:none}
+    .logo::after{content:"";position:absolute;inset:8px 7px 7px;border:2px solid var(--warm);border-top:0;border-inline-end:0;transform:rotate(-45deg) translate(1px,-2px);border-radius:1px}
     .nav{display:flex;gap:4px;margin-inline-start:auto;font-size:14.5px}
-    .nav a{color:var(--muted);padding:6px 12px;border-radius:8px}
-    .nav a.lng{color:var(--fg);border:1px solid var(--line);border-radius:999px;font-weight:600}
-    .nav a:hover{color:var(--fg);background:var(--panel-2)}
-    .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;background:var(--fg);color:var(--ink);transition:transform .2s,box-shadow .2s}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px -10px rgba(140,140,255,.7)}
-    .btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+    .nav a{color:var(--muted);padding:7px 13px;border-radius:999px}
+    .nav a.lng{color:var(--fg);border:1px solid var(--line);font-weight:600;background:var(--panel)}
+    .nav a:hover{color:var(--fg);background:var(--panel)}
+    .btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:15px;border-radius:999px;padding:12px 22px;background:var(--warm);color:var(--fg);transition:transform .35s var(--ez),box-shadow .3s,background .25s}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px -14px rgba(242,179,61,.9)}
+    .btn .ar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--fg);color:var(--warm);margin-inline-end:-10px;font-size:14px}
+    .btn.ghost{background:var(--panel);color:var(--fg);border:1px solid var(--line)}
+    .btn.ghost:hover{box-shadow:0 10px 24px -16px rgba(22,35,58,.5)}
     @media (max-width:760px){.nav a.h{display:none}}
 
-    .byline{margin:0;color:var(--accent-2);font-size:14px;letter-spacing:.04em}
-    .hero{position:relative;padding:150px 0 70px;overflow:hidden}
-    .hero::before{content:"";position:absolute;inset:-30% -10% auto;height:120%;background:radial-gradient(40% 50% at 70% 20%,rgba(140,140,255,.22),transparent 70%),radial-gradient(30% 40% at 25% 40%,rgba(69,210,236,.12),transparent 70%);pointer-events:none}
-    .hero-g{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 48px;align-items:center}
-    .hero-t{display:grid;gap:22px;justify-items:start;min-width:0}
+    .byline{margin:0;display:inline-flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;letter-spacing:.06em;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 14px}
+    .byline::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(15,122,82,.14)}
+    .hero{position:relative;padding:140px 0 70px;overflow:hidden}
+    .hero::before{content:"";position:absolute;inset:-20% -10% auto;height:110%;background:radial-gradient(38% 45% at 75% 22%,rgba(242,179,61,.20),transparent 70%),radial-gradient(30% 40% at 20% 35%,rgba(108,76,241,.10),transparent 70%);pointer-events:none}
+    .hero-g{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 56px;align-items:center}
+    .hero-t{display:grid;gap:24px;justify-items:start;min-width:0}
     .hero .facts{grid-column:1/-1}
-    .shark{min-width:0;border:1px solid var(--line);border-radius:14px;background:rgba(15,17,26,.85);box-shadow:0 40px 80px -30px rgba(140,140,255,.35),0 0 0 1px rgba(255,255,255,.02) inset;transform:perspective(1200px) rotateY(8deg) rotateX(4deg);overflow:hidden}
-    .shark-h{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);direction:ltr}
-    .shark-h i{width:10px;height:10px;border-radius:50%;background:#2A2F48}
-    .shark-h span{margin-left:10px;font-size:12px;color:var(--muted)}
+    .shark{min-width:0;border:1px solid var(--screen-line);border-radius:16px;background:var(--screen);box-shadow:0 50px 90px -40px rgba(22,35,58,.55),0 0 0 6px rgba(255,255,255,.7);transform:perspective(1200px) rotateY(-7deg) rotateX(4deg);overflow:hidden;color:var(--s-fg2)}
+    html[dir="rtl"] .shark{transform:perspective(1200px) rotateY(7deg) rotateX(4deg)}
+    .shark-h{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--screen-line);direction:ltr}
+    .shark-h i{width:10px;height:10px;border-radius:50%;background:#33405F}
+    .shark-h i:nth-child(1){background:#F26B5B}.shark-h i:nth-child(2){background:var(--warm)}.shark-h i:nth-child(3){background:#4FD39A}
+    .shark-h span{margin-left:10px;font-size:12px;color:var(--s-mut)}
     .shark-c{font-size:11.5px;height:300px;overflow:hidden;position:relative}
     .sr-h,.sr{display:grid;grid-template-columns:34px 52px 200px 44px minmax(0,1fr);gap:8px;padding:5px 12px;white-space:nowrap}
-    .sr-h{color:var(--muted);border-bottom:1px solid var(--line);background:var(--panel-2);position:relative;z-index:2}
+    .sr-h{color:var(--s-mut);border-bottom:1px solid var(--screen-line);background:var(--screen-2);position:relative;z-index:2}
     .sr span{overflow:hidden;text-overflow:ellipsis}
-    .sr{color:var(--fg-2);border-bottom:1px solid rgba(30,34,53,.6)}
-    .sr.p-FTP span:nth-child(4){color:var(--data)}
-    .sr.p-TCP span:nth-child(4){color:var(--accent-2)}
-    .sr.on{background:rgba(140,140,255,.16);color:#fff}
+    .sr{color:var(--s-fg2);border-bottom:1px solid rgba(36,48,79,.6)}
+    .sr.p-FTP span:nth-child(4){color:var(--s-data)}
+    .sr.p-TCP span:nth-child(4){color:var(--s-ac)}
+    .sr.on{background:rgba(156,140,255,.16);color:#fff}
     .sr-b{animation:roll 24s linear infinite}
     @keyframes roll{0%,8%{transform:translateY(0)}100%{transform:translateY(-50%)}}
-    @media (max-width:900px){.hero-g{grid-template-columns:minmax(0,1fr)}.shark{transform:none}}
+    @media (max-width:900px){.hero-g{grid-template-columns:minmax(0,1fr)}.shark,html[dir="rtl"] .shark{transform:none}}
     .pill{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--fg-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--panel)}
-    .pill i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
-    .hero h1{font-size:clamp(2.4rem,6vw,4.6rem);font-weight:700;letter-spacing:-.02em;max-width:16ch;background:linear-gradient(180deg,#fff 30%,#A9ADD0);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero p.l{font-size:clamp(1.05rem,1.6vw,1.25rem);color:var(--fg-2);max-width:56ch}
+    .pill i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+    .hero h1{font-size:clamp(2.5rem,5.6vw,4.4rem);font-weight:700;letter-spacing:-.03em;line-height:1.06;max-width:15ch;color:var(--fg)}
+    html[dir="rtl"] .hero h1{letter-spacing:0;line-height:1.3}
+    .hero h1 em{font-style:normal;color:var(--accent-2)}
+    .hero p.l{font-size:clamp(1.05rem,1.5vw,1.2rem);color:var(--fg-2);max-width:54ch}
     .row{display:flex;flex-wrap:wrap;gap:12px}
-    .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:30px;width:100%}
-    .facts div{background:var(--panel);padding:16px 18px;display:grid;gap:2px}
-    .facts b{text-align:start;font-family:var(--f-mono);font-size:1.6rem;font-weight:500}
-    .facts span{font-size:13.5px;color:var(--muted)}
-    @media (max-width:700px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:40px;width:100%}
+    .facts div{padding:20px 22px;display:grid;gap:4px}
+    .facts div+div{border-inline-start:1px solid var(--line)}
+    .facts b{text-align:start;font-family:var(--f-mono);font-size:clamp(1.6rem,2.6vw,2.2rem);font-weight:500;color:var(--fg);letter-spacing:-.02em}
+    .facts span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+    @media (max-width:700px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div:nth-child(3){border-inline-start:0}.facts div:nth-child(n+3){border-top:1px solid var(--line)}}
 
     /* story */
     .story{position:relative}
-    .story-g{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px}
+    .story-g{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:48px}
     .chaps{padding-block:10vh 30vh}
-    .chap{min-height:72vh;display:grid;align-content:center;gap:12px;opacity:.35;transition:opacity .5s}
-    .chap.on{opacity:1}
+    .chap{min-height:72vh;display:grid;align-content:center;gap:12px;opacity:.3;transition:opacity .5s,transform .6s var(--ez);transform:translateY(10px)}
+    .chap.on{opacity:1;transform:none}
     .chap .ck{font-size:12.5px;color:var(--accent);letter-spacing:.15em}
-    .chap h3{font-size:clamp(1.6rem,2.6vw,2.2rem);font-weight:700}
+    .chap h3{font-size:clamp(1.7rem,2.8vw,2.4rem);font-weight:700;letter-spacing:-.02em}
+    html[dir="rtl"] .chap h3{letter-spacing:0}
     .chap p{color:var(--fg-2);max-width:46ch}
-    .term{margin:6px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);font-size:12.5px;color:var(--data);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;max-width:100%}
-    .stage{position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100svh - 62px)}
+    .term{margin:6px 0 0;padding:12px 14px;border:1px solid var(--screen-line);border-radius:10px;background:var(--screen);font-size:12.5px;color:var(--s-data);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;max-width:100%}
+    .stage{position:sticky;top:76px;height:calc(100vh - 92px);height:calc(100svh - 92px);background:var(--screen);border-radius:22px;border:1px solid var(--screen-line);box-shadow:0 40px 80px -46px rgba(22,35,58,.6),0 0 0 6px rgba(255,255,255,.7);overflow:hidden}
     #net{width:100%;height:100%;display:block;direction:ltr}
     .prog{position:absolute;bottom:22px;inset-inline:10%;display:flex;gap:6px}
-    .prog i{flex:1;height:3px;border-radius:3px;background:var(--line);overflow:hidden;position:relative}
-    .prog i b{position:absolute;inset:0;background:linear-gradient(90deg,var(--accent),var(--data));transform:scaleX(0);transform-origin:right;transition:transform .4s}
+    .prog i{flex:1;height:3px;border-radius:3px;background:var(--screen-line);overflow:hidden;position:relative}
+    .prog i b{position:absolute;inset:0;background:linear-gradient(90deg,var(--warm),var(--s-ac));transform:scaleX(0);transform-origin:right;transition:transform .4s}
     .prog i.on b{transform:scaleX(1)}
     @media (max-width:900px){
       .story-g{display:flex;flex-direction:column}
-      .stage{order:-1;top:62px;height:46vh;height:46svh;z-index:2;background:linear-gradient(var(--ink) 88%,transparent)}
+      .stage{order:-1;top:72px;height:44vh;height:44svh;z-index:2;border-radius:18px}
       .chaps{padding-top:0}
       .chap{min-height:70vh}
       .prog{display:none}
     }
 
     .sec{padding-block:clamp(70px,10vw,120px)}
-    .sec-h{display:grid;gap:10px;max-width:640px;margin-bottom:36px}
+    .sec-h{display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+    .sec-h>div{display:grid;gap:10px;max-width:640px}
     .eyb{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.16em;color:var(--accent)}
-    .sec-h h2{font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:700}
+    .sec-h h2{font-size:clamp(2rem,3.8vw,3rem);font-weight:700;letter-spacing:-.03em}
+    html[dir="rtl"] .sec-h h2{letter-spacing:0}
     .sec-h p{color:var(--fg-2)}
-    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
     @media (max-width:980px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (max-width:600px){.cards{grid-template-columns:minmax(0,1fr)}}
-    .card{display:grid;gap:10px;align-content:start;padding:20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--panel-2),var(--panel));transition:border-color .25s,transform .25s}
-    .card:hover{border-color:rgba(140,140,255,.55);transform:translateY(-3px)}
+    .card{display:grid;grid-template-rows:auto auto 1fr auto;gap:10px;padding:22px;border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:0 1px 2px rgba(22,35,58,.04),0 10px 30px -22px rgba(22,35,58,.35);transition:border-color .25s,transform .45s var(--ez),box-shadow .3s}
+    .card:hover{border-color:var(--accent-2);transform:translateY(-4px);box-shadow:0 22px 40px -24px rgba(91,63,224,.45)}
     .card-t{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted)}
+    .card-t .mono:first-child{background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+    .card-t .mono:last-child{font-size:30px;font-weight:500;color:var(--accent-2);opacity:.35;line-height:1;transition:opacity .3s}
+    .card:hover .card-t .mono:last-child{opacity:1}
     .st{display:inline-flex;align-items:center;gap:6px}
     .st i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
     .st-data i{background:var(--ok)}.st-theory i{background:var(--accent)}.st-pending i{background:var(--warm)}
-    .card h3{font-size:1.15rem}
+    .card h3{font-size:1.18rem;letter-spacing:-.01em}
     .card p{font-size:14.5px;color:var(--fg-2);line-height:1.7}
-    .more{font-size:13.5px;color:var(--accent);font-weight:600}
+    .more{font-size:13.5px;color:var(--fg);font-weight:700;display:inline-flex;align-items:center;gap:8px}
+    .more::after{content:"→";color:var(--warm);transition:transform .35s var(--ez)}
+    html[dir="rtl"] .more::after{content:"←"}
+    .card:hover .more::after{transform:translateX(4px)}
+    html[dir="rtl"] .card:hover .more::after{transform:translateX(-4px)}
     .method{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
     .method div{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--panel);display:grid;gap:8px}
     .method b{font-size:1.05rem}
@@ -121,6 +142,13 @@
     @media (max-width:860px){.method{grid-template-columns:minmax(0,1fr)}}
     .foot{border-top:1px solid var(--line);padding-block:30px;color:var(--muted);font-size:14px}
     .foot .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+    .foot a{color:var(--fg)}
+    @media (prefers-reduced-motion:no-preference){
+      .hero-t>*,.shark,.facts{animation:up .9s var(--ez) both}
+      .hero-t>*:nth-child(2){animation-delay:.08s}.hero-t>*:nth-child(3){animation-delay:.18s}.hero-t>*:nth-child(4){animation-delay:.28s}
+      .shark{animation-delay:.2s}.facts{animation-delay:.4s}
+    }
+    @keyframes up{from{opacity:0;translate:0 22px}to{opacity:1;translate:0 0}}
     @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.chap{opacity:1}}
     </style>
     </head>
@@ -133,9 +161,9 @@
     <main>
     <section class="hero"><div class="wrap hero-g"><div class="hero-t">
     <p class="byline mono" dir="ltr">Fahad Awad · King Saud University</p>
-    <h1>Build the network. Then read every packet in it.</h1>
+    <h1>Build the network. <em>Then read every packet in it.</em></h1>
     <p class="l">Nine projects in network protocols and simulation. Each one starts from zero: the software, the setup, the commands, then we open the packets and read them byte by byte.</p>
-    <div class="row"><a class="btn" href="#story">Watch it being built</a><a class="btn ghost" href="#projects">Projects</a></div>
+    <div class="row"><a class="btn" href="#story">Watch it being built<span class="ar" aria-hidden="true">↓</span></a><a class="btn ghost" href="#projects">Projects</a></div>
     </div>
     <div class="shark" aria-hidden="true"><div class="shark-h"><i></i><i></i><i></i><span class="mono">ftp.pcapng — Wireshark</span></div><div class="shark-c mono" dir="ltr"><div class="sr-h"><span>No.</span><span>Time</span><span>Source → Destination</span><span>Proto</span><span>Info</span></div><div class="sr-b"><div class="sr p-TCP"><span>2</span><span>2.032</span><span>189.120.0.57 → 189.120.0.58</span><span>TCP</span><span>SYN</span></div><div class="sr p-TCP"><span>3</span><span>2.032</span><span>189.120.0.58 → 189.120.0.57</span><span>TCP</span><span>SYN ACK</span></div><div class="sr p-TCP"><span>4</span><span>2.032</span><span>189.120.0.57 → 189.120.0.58</span><span>TCP</span><span>ACK</span></div><div class="sr p-FTP"><span>5</span><span>2.038</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>220 Microsoft FTP Service</span></div><div class="sr p-FTP"><span>6</span><span>2.038</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>USER anonymous</span></div><div class="sr p-FTP"><span>7</span><span>2.038</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>331 Anonymous access allowed, send iden…</span></div><div class="sr p-FTP"><span>8</span><span>2.039</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>PASS User@</span></div><div class="sr p-FTP"><span>9</span><span>2.042</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>230 User logged in.</span></div><div class="sr p-FTP"><span>10</span><span>2.042</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>opts utf8 on</span></div><div class="sr p-FTP"><span>11</span><span>2.043</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>200 OPTS UTF8 command successful - UTF8…</span></div><div class="sr p-FTP"><span>12</span><span>2.043</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>syst</span></div><div class="sr p-FTP"><span>13</span><span>2.043</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>215 Windows_NT</span></div><div class="sr p-FTP"><span>14</span><span>2.044</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>site help</span></div><div class="sr p-FTP"><span>15</span><span>2.044</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>214-The following SITE commands are rec…</span></div><div class="sr p-FTP"><span>16</span><span>2.044</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>DIRSTYLE</span></div><div class="sr p-FTP"><span>17</span><span>2.044</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>HELP</span></div><div class="sr p-TCP"><span>2</span><span>2.032</span><span>189.120.0.57 → 189.120.0.58</span><span>TCP</span><span>SYN</span></div><div class="sr p-TCP"><span>3</span><span>2.032</span><span>189.120.0.58 → 189.120.0.57</span><span>TCP</span><span>SYN ACK</span></div><div class="sr p-TCP"><span>4</span><span>2.032</span><span>189.120.0.57 → 189.120.0.58</span><span>TCP</span><span>ACK</span></div><div class="sr p-FTP"><span>5</span><span>2.038</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>220 Microsoft FTP Service</span></div><div class="sr p-FTP"><span>6</span><span>2.038</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>USER anonymous</span></div><div class="sr p-FTP"><span>7</span><span>2.038</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>331 Anonymous access allowed, send iden…</span></div><div class="sr p-FTP"><span>8</span><span>2.039</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>PASS User@</span></div><div class="sr p-FTP"><span>9</span><span>2.042</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>230 User logged in.</span></div><div class="sr p-FTP"><span>10</span><span>2.042</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>opts utf8 on</span></div><div class="sr p-FTP"><span>11</span><span>2.043</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>200 OPTS UTF8 command successful - UTF8…</span></div><div class="sr p-FTP"><span>12</span><span>2.043</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>syst</span></div><div class="sr p-FTP"><span>13</span><span>2.043</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>215 Windows_NT</span></div><div class="sr p-FTP"><span>14</span><span>2.044</span><span>189.120.0.57 → 189.120.0.58</span><span>FTP</span><span>site help</span></div><div class="sr p-FTP"><span>15</span><span>2.044</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>214-The following SITE commands are rec…</span></div><div class="sr p-FTP"><span>16</span><span>2.044</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>DIRSTYLE</span></div><div class="sr p-FTP"><span>17</span><span>2.044</span><span>189.120.0.58 → 189.120.0.57</span><span>FTP</span><span>HELP</span></div></div></div></div>
     <div class="facts"><div><b>9</b><span>projects</span></div><div><b>9</b><span>protocols</span></div><div><b>4/4</b><span>ping replies</span></div><div><b dir="ltr">128 → 127</b><span>TTL across the router</span></div></div>
@@ -152,7 +180,7 @@ ACK      Seq=693140713 Ack=3010248288</pre></article><article class="chap" data-
     </div></section>
 
     <section class="sec" id="projects"><div class="wrap">
-    <div class="sec-h"><span class="eyb">PROJECTS</span><h2>Projects</h2><p>Pick a project and follow it step by step.</p></div>
+    <div class="sec-h"><div><span class="eyb">PROJECTS</span><h2>Projects</h2><p>Pick a project and follow it step by step.</p></div></div>
     <div class="cards"><a class="card" href="guides/ftp/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">01</span></div><h3>Capturing and analysing an FTP session</h3><p>We set up an FTP server and a client on virtual machines, capture a full session, and read the control channel and both data channels packet by packet.</p><span class="more">Open the project</span></a><a class="card" href="guides/ftp-bulk/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">02</span></div><h3>Transferring a 10 KB file over FTP</h3><p>We download a 10,240-byte file with RETR, follow the data connection from open to close, and find out why the whole file showed up in one frame.</p><span class="more">Open the project</span></a><a class="card" href="guides/smtp-pop3/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">03</span></div><h3>Mail server: sending with SMTP, receiving with POP3</h3><p>We build a mail server with hMailServer, send a message from one machine, receive it on another, and read both conversations in full.</p><span class="more">Open the project</span></a><a class="card" href="guides/telnet/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">04</span></div><h3>Dissecting a Telnet session</h3><p>We connect to a Telnet server and read the option negotiation, an NTLM login attempt, and a login typed one character at a time.</p><span class="more">Open the project</span></a><a class="card" href="guides/tcp-piggybacking/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">05</span></div><h3>A TCP piggybacking scenario</h3><p>Three messages in each direction: we compute Seq and Ack for every segment and see how the acknowledgment rides along with the data.</p><span class="more">Open the project</span></a><a class="card" href="guides/tcp-retransmission/"><div class="card-t"><span class="mono">COS 370</span><span class="mono">06</span></div><h3>Two lost segments and their retransmission</h3><p>The same piggybacking scenario, but S4 and S6 are lost. We see how the sender detects the loss when the RTO expires and resends with the same header.</p><span class="more">Open the project</span></a><a class="card" href="guides/arp-icmp/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">07</span></div><h3>What happens when you ping? ARP and ICMP</h3><p>We capture a ping between two machines and decode the ARP request and reply, then the ICMP echo messages, byte by byte.</p><span class="more">Open the project</span></a><a class="card" href="guides/vlan-intervlan/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">08</span></div><h3>VLANs and inter-VLAN routing in GNS3</h3><p>We split the network into VLAN 10 (staff) and VLAN 20 (student), watch the 802.1Q tag on the trunk, then join the two with a router-on-a-stick and see the TTL and the tag change.</p><span class="more">Open the project</span></a><a class="card" href="guides/ethernet-history/"><div class="card-t"><span class="mono">COS 372</span><span class="mono">09</span></div><h3>How Ethernet evolved</h3><p>From 10 Mbps over coaxial cable in 1983 to 800 Gigabit today.</p><span class="more">Open the project</span></a></div>
     </div></section>
 

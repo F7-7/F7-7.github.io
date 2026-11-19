@@ -4,7 +4,7 @@
   /* theme */
   const tb = $('.theme');
   if (tb) tb.addEventListener('click', () => {
-    const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const cur = document.documentElement.dataset.theme || 'light';
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     try { localStorage.setItem('fnl-theme', next); } catch(e) {}

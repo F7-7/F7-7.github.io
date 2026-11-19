@@ -1,24 +1,17 @@
 /* Fahad Net Lab · docs system.
    Layout: sticky top bar; three-column docs grid (guide nav · article · on-this-page) collapsing to one column on phones. */
 :root{
-  --bg:#FFFFFF; --surface:#F6F7FB; --raise:#FFFFFF; --line:#E4E7F0; --line-2:#D3D8E6;
-  --fg:#0B1030; --fg-2:#2C3355; --muted:#5D6585;
-  --accent:#4F4CE8; --accent-soft:#EEEEFF; --data:#0E9DB4; --data-soft:#E3F7FA;
-  --warn:#B86A00; --warn-soft:#FFF5E3; --ok:#0F7E55; --ok-soft:#E4F6EE; --bad:#C2334B;
-  --code-bg:#0E1230; --code-fg:#DCE1FF; --code-line:#262B57;
+  --bg:#F8F5EE; --surface:#F1ECE1; --raise:#FFFFFF; --line:#E6DFD0; --line-2:#D8CFBC;
+  --fg:#16233A; --fg-2:#2E3B52; --muted:#5F6878;
+  --accent:#5B3FE0; --accent-soft:#EFEAFF; --data:#0E7C8C; --data-soft:#E1F3F4;
+  --warn:#9A5B00; --warn-soft:#FFF3DA; --ok:#0F7A52; --ok-soft:#E2F4EB; --bad:#B8323F;
+  --code-bg:#14203A; --code-fg:#E3E8F5; --code-line:#25334F;
   --hl:#FFE7A3; --hl-fg:#3B2A00;
   --f-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
   --r:12px; --gutter:clamp(16px,3vw,32px);
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0A0B12; --surface:#10121C; --raise:#141725; --line:#1F2336; --line-2:#2A2F48;
-  --fg:#E9EBF7; --fg-2:#C6CAE2; --muted:#8C92B0;
-  --accent:#8C8CFF; --accent-soft:#1B1C3A; --data:#45D2EC; --data-soft:#0F2830;
-  --warn:#F2B65A; --warn-soft:#2A2010; --ok:#4FD39A; --ok-soft:#10261D; --bad:#FF7A90;
-  --code-bg:#070812; --code-fg:#D6DBFF; --code-line:#1B1F36; --hl:#5A4710; --hl-fg:#FFE9AE;
-  color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0A0B12; --surface:#10121C; --raise:#141725; --line:#1F2336; --line-2:#2A2F48;
   --fg:#E9EBF7; --fg-2:#C6CAE2; --muted:#8C92B0;
@@ -47,8 +40,8 @@ code{font-family:var(--f-mono);font-size:.86em;background:var(--surface);border:
 .top-in{max-width:1440px;margin:0 auto;padding-inline:var(--gutter);height:60px;display:flex;align-items:center;gap:20px}
 .brand{display:flex;align-items:center;gap:10px;color:var(--fg);font-weight:700;letter-spacing:-.01em}
 .brand:hover{text-decoration:none}
-.logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(140deg,var(--accent),var(--data));position:relative}
-.logo::after{content:"";position:absolute;inset:7px 6px 6px;border:2px solid #fff;border-top:0;border-inline-end:0;transform:rotate(-45deg) translate(1px,-2px);border-radius:1px}
+.logo{width:26px;height:26px;border-radius:8px;background:#16233A;position:relative}
+.logo::after{content:"";position:absolute;inset:7px 6px 6px;border:2px solid #F2B33D;border-top:0;border-inline-end:0;transform:rotate(-45deg) translate(1px,-2px);border-radius:1px}
 .top-nav{display:flex;gap:4px;margin-inline-start:auto}
 .top-nav a{color:var(--muted);font-size:14.5px;padding:6px 12px;border-radius:8px}
 .top-nav a:hover{color:var(--fg);background:var(--surface);text-decoration:none}
@@ -125,7 +118,7 @@ code{font-family:var(--f-mono);font-size:.86em;background:var(--surface);border:
 .code-h{display:flex;justify-content:space-between;align-items:center;padding:6px 8px 6px 14px;border-bottom:1px solid var(--code-line);direction:ltr}
 .code-h span{font-family:var(--f-mono);font-size:12px;color:#8A90C0;text-transform:lowercase}
 .copy{font:inherit;font-size:12.5px;border:1px solid var(--code-line);background:transparent;color:#C9CEFF;border-radius:7px;padding:3px 10px;cursor:pointer}
-.copy:hover{background:#1C2150}
+.copy:hover{background:#22314F}
 .copy.done{color:#7DF0BE;border-color:#2F6E58}
 pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--f-mono);font-size:13.5px;line-height:1.75;color:var(--code-fg);text-align:left}
 pre code{background:none;border:0;padding:0;font-size:inherit;color:inherit}
@@ -237,16 +230,16 @@ details.err p{font-size:15px;color:var(--fg-2);margin-bottom:6px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ---- guide hero (always dark, Linear-like) ---- */
-.ghero{--surface:#10121C;--raise:#141725;--line:#23283F;--line-2:#2E3452;--fg:#EDEEF7;--muted:#8C92B0;--accent:#8C8CFF;--accent-soft:rgba(140,140,255,.12);--data:#45D2EC;
-  background:radial-gradient(60% 80% at 15% 0%,rgba(140,140,255,.18),transparent 60%),radial-gradient(40% 60% at 90% 100%,rgba(69,210,236,.10),transparent 60%),#0A0B14;color:var(--fg);border-bottom:1px solid var(--line)}
+.ghero{background:radial-gradient(50% 80% at 85% 0%,rgba(242,179,61,.18),transparent 60%),radial-gradient(40% 60% at 10% 100%,rgba(108,76,241,.08),transparent 60%),var(--bg);color:var(--fg);border-bottom:1px solid var(--line)}
+:root[data-theme="dark"] .ghero{background:radial-gradient(60% 80% at 15% 0%,rgba(140,140,255,.18),transparent 60%),#0A0B14}
 .ghero-in{max-width:1440px;margin:0 auto;padding:56px var(--gutter) 52px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:48px;align-items:center}
 .ghero-t{display:grid;gap:14px;min-width:0}
 .ghero .crumb{color:var(--accent);font-size:13px;letter-spacing:.12em}
-.ghero h1{font-size:clamp(2rem,3.8vw,3.1rem);font-weight:700;letter-spacing:-.015em;color:#fff}
-.ghero .lead{font-size:18px;color:#B9BDD6;max-width:52ch}
+.ghero h1{font-size:clamp(2rem,3.8vw,3.1rem);font-weight:700;letter-spacing:-.025em;color:var(--fg)}
+.ghero .lead{font-size:18px;color:var(--fg-2);max-width:52ch}
 .learn{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:6px 0 0}
-.rep{display:inline-flex;justify-self:start;align-self:start;width:max-content;max-width:100%;align-items:center;gap:8px;margin-top:14px;font-size:14px;font-weight:600;color:#fff;background:linear-gradient(135deg,#6b6bff,#3fb6d4);padding:9px 16px;border-radius:10px;text-decoration:none;box-shadow:0 8px 24px -10px rgba(107,107,255,.8)}.rep:hover{filter:brightness(1.1)}
-.learn li{font-size:13px;border:1px solid var(--line-2);border-radius:999px;padding:4px 12px;color:#C9CDE6;background:rgba(255,255,255,.03)}
+.rep{display:inline-flex;justify-self:start;align-self:start;width:max-content;max-width:100%;align-items:center;gap:8px;margin-top:14px;font-size:14px;font-weight:600;color:#16233A;background:#F2B33D;padding:10px 18px;border-radius:999px;text-decoration:none;box-shadow:0 12px 26px -14px rgba(242,179,61,.95)}.rep:hover{filter:brightness(1.1)}
+.learn li{font-size:13px;border:1px solid var(--line-2);border-radius:999px;padding:4px 12px;color:var(--fg-2);background:var(--raise)}
 .ghero-v{min-width:0}
 .ghero .topo{background:rgba(255,255,255,.02);margin:0}
 .ghero .cap{font-size:13px;color:var(--muted);margin-top:8px}
